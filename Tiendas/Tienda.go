@@ -11,19 +11,34 @@ type Tienda struct{
 	Contacto string `json:"Contacto, omitempty"`
 	Calificacion int `json:"Calificacion, omitempty"`
 }
+//Definir una funcion que genere el Id de las tiendas basados en el codigo ascii para odenarlos al ser insertados en la lista
+func (t *Tienda) GenerarId(Nombre string) int{
+	str := Nombre
+	runes := []rune(str)
+	var arr []int
+	for i :=0; i < len(runes); i++{
+		arr = append(arr,int(runes[i]))
+	}
+	var resultado = 0
+	for _, valor := range arr{
+		
+		resultado = resultado + valor
+	}
+	return resultado
+}
 //Definir la estructura de los departamentos que contiene el nombre del departamento y un arrego de tiendas
 type Departamento struct{
 	Nombre string `json:"Nombre, omitempty"`
-	Tiendas [] *Tienda `json:"Tiendas, omitempty"`
+	Tiendas [] Tienda `json:"Tiendas, omitempty"`
 }
 //Definir la estructura Datos que contienen el nombre del indice y un arreglo de departamentos
 type Datos struct{
 	Indice string `json:"Indice, omitempty"`
-	Departamentos [] *Departamento `json:"Departamentos, omitempty"`
+	Departamentos [] Departamento `json:"Departamentos, omitempty"`
 }
 
 type Inicio struct{
-	Data []*Datos `json:"Datos, omitempty"`
+	Data []Datos `json:"Datos, omitempty"`
 }
 
 //Definir una funcion para crear nuevas tiendas
