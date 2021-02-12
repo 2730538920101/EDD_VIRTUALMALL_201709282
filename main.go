@@ -4,18 +4,26 @@ import (
 	"fmt"
 	"./Tiendas"
 	"./Estructura"
+	"github.com/gorilla/mux"
+	"net/http"
+	"log"
+	"encoding/json"
+	"io/ioutil"
 )
+//Declarar una variable de tipo arreglo para almacenar los datos
+var datos [] Tiendas.Inicio
+//Declarar la variables de tipo ListaDoble
+var lista *Estructura.Lista
+//Declarar las variables de tipo Tienda 
+var tienda1 *Tiendas.Tienda
+var tienda2 *Tiendas.Tienda
+var tienda3 *Tiendas.Tienda
+var tienda4 *Tiendas.Tienda
+var tienda5 *Tiendas.Tienda
 
 func main(){
 	fmt.Println("Proyecto de Estructura de Datos, Fase 1")
-	//Declarar la variables de tipo ListaDoble
-	var lista *Estructura.Lista
-	//Declarar las variables de tipo Tienda 
-	var tienda1 *Tiendas.Tienda
-	var tienda2 *Tiendas.Tienda
-	var tienda3 *Tiendas.Tienda
-	var tienda4 *Tiendas.Tienda
-	var tienda5 *Tiendas.Tienda
+	
 
 	//Crear la lista 
 	lista = Estructura.Nueva_Lista()
@@ -36,6 +44,36 @@ func main(){
 	lista.Buscar(1)
 	lista.Eliminar(2)
 	lista.Imprimir()
+
+	//Crear el enrutador
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", indexRoute)
+	router.HandleFunc("/cargartienda", CargarTiendas).Methods("POST")
+	log.Fatal(http.ListenAndServe(":3000", router))
+
 	
+	
+
+}
+
+//Definir una ruta de inicio
+func indexRoute(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintf(w, "Proyecto fase 1 desde el servidor")
+}
+
+//Definir una funcion para Cargar las tiendas
+func CargarTiendas(w http.ResponseWriter, r *http.Request){
+
+	var data Tiendas.Inicio 
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err!= nil{
+		fmt.Fprintf(w, "Ingrese una tienda valida")
+	}
+	json.Unmarshal(reqBody, &data)
+	datos = append(datos, data)
+	w.Header().Set("Content-Type","application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(data)
+
 
 }
