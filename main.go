@@ -13,11 +13,10 @@ import (
 	
 )
 //Declarar una variable de tipo arreglo para almacenar los indices
-//var index [] string
+var index [] string
 //Declarar una variable de tipo arreglo para almacenar los departamentos
-//var departamentos [] string
-//Declarar una variable de tipo arreglo para almacenar las tiendas
-//var tiendas [] Tiendas.Tienda
+var departamentos [] string
+
 //Declarar una variable de tipo arreglo para almacenar los datos
 var datos [] Tiendas.Inicio
 var data Tiendas.Inicio
@@ -28,6 +27,7 @@ var lista3 *Estructura.Lista
 var lista4 *Estructura.Lista
 var lista5 *Estructura.Lista
 var listas [] *Estructura.Lista
+
 
 var tienda1 *Tiendas.Tienda
 var tienda2 *Tiendas.Tienda
@@ -70,9 +70,10 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	var c_datos int = 0
 	var c_dep int = 0
 	var c_tiendas int = 0
-
+	
+	
 	for _, d := range data.Data {
-		//index = append(index, d.Indice)
+		index = append(index, d.Indice)
 		for _, dep := range d.Departamentos {
 			//departamentos = append(departamentos, d.Departamentos[c_dep].Nombre)
 			lista1 = Estructura.Nueva_Lista()
@@ -80,12 +81,13 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 			lista3 = Estructura.Nueva_Lista()
 			lista4 = Estructura.Nueva_Lista()
 			lista5 = Estructura.Nueva_Lista()
+			departamentos = append(departamentos, data.Data[c_datos].Departamentos[c_dep].Nombre)
 			for _, t := range dep.Tiendas {
 				
 				data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Id = t.GenerarId(t.Nombre)
 				//tiendas = append(tiendas, d.Departamentos[c_dep].Tiendas[c_tiendas])
 				if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 1{
-					lista1.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
+					lista1.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])	
 				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 2{
 					lista2.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
 				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 3{
@@ -122,26 +124,14 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 		lis.Imprimir()
 		fmt.Println("LA POSICION DE ESTA LISTA ES: ", pos)
 	}
-	
-	/*for _, indice := range index{
-		fmt.Println("INDICE: ", indice)
-	}
-	for _, depa := range departamentos{
-		fmt.Println("DEPARTAMENTO: ", depa)
-	}
-	for _, tienda := range tiendas{
-		fmt.Println("TIENDA: ", tienda)
-	}
 
-	epfinal := RemoveDuplicatesFromSlice(departamentos)
+	depfinal := RemoveDuplicatesFromSlice(departamentos)
 	departamentos = depfinal
-	fmt.Println(departamentos)
-	*/
-	
+
 }
 
 //Definir una funcion que elimine los repetidos en el array de departamentos
-/*func RemoveDuplicatesFromSlice(s []string) []string {
+func RemoveDuplicatesFromSlice(s []string) []string {
 	m := make(map[string]bool)
 	for _, item := range s {
 			if _, ok := m[item]; ok {
@@ -157,5 +147,4 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 			result = append(result, item)
 	}
 	return result
-}*/
-
+}

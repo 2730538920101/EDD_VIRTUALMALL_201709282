@@ -26,7 +26,7 @@ type Lista struct{
 
 //Definir una funcion para crear una nueva lista
 func Nueva_Lista() *Lista{
-	fmt.Println("Se ha creado una nueva lista doble")
+
 	return &Lista{nil,nil,0}
 }
 
