@@ -13,48 +13,31 @@ import (
 	
 )
 //Declarar una variable de tipo arreglo para almacenar los indices
-var index [] string
+//var index [] string
 //Declarar una variable de tipo arreglo para almacenar los departamentos
-var departamentos [] string
+//var departamentos [] string
 //Declarar una variable de tipo arreglo para almacenar las tiendas
-var tiendas [] Tiendas.Tienda
+//var tiendas [] Tiendas.Tienda
 //Declarar una variable de tipo arreglo para almacenar los datos
 var datos [] Tiendas.Inicio
 var data Tiendas.Inicio
 //Declarar la variables de tipo ListaDoble
-var lista *Estructura.Lista
+var lista1 *Estructura.Lista
+var lista2 *Estructura.Lista
+var lista3 *Estructura.Lista
+var lista4 *Estructura.Lista
+var lista5 *Estructura.Lista
+var listas [] *Estructura.Lista
 
-//var tienda1 *Tiendas.Tienda
-//var tienda2 *Tiendas.Tienda
-//var tienda3 *Tiendas.Tienda
-//var tienda4 *Tiendas.Tienda
-//var tienda5 *Tiendas.Tienda
+var tienda1 *Tiendas.Tienda
+var tienda2 *Tiendas.Tienda
+var tienda3 *Tiendas.Tienda
+var tienda4 *Tiendas.Tienda
+var tienda5 *Tiendas.Tienda
 
 
 func main(){
 	fmt.Println("Proyecto de Estructura de Datos, Fase 1")
-	
-
-	//Crear la lista 
-	//lista = Estructura.Nueva_Lista()
-	//Crear Tiendas
-	//tienda1 = Tiendas.Nueva_Tienda(1,"Tienda 1", "Tienda de zapatos", "215189461", 5)
-	//tienda2 = Tiendas.Nueva_Tienda(2,"Tienda 2", "Tienda de Ropa", "21564857", 4)
-	//tienda3 = Tiendas.Nueva_Tienda(3,"Tienda 3", "Tienda de Animales", "786451864", 3)
-	//tienda4 = Tiendas.Nueva_Tienda(4,"Tienda 4", "Tienda de Electronicos", "6549861", 2)
-	//tienda5 = Tiendas.Nueva_Tienda(5,"Tienda 5", "Tienda de Mochilas", "5623189", 1)
-	
-	//lista.Insertar(tienda1)
-	//lista.Insertar(tienda2)
-	//lista.Insertar(tienda3)
-	//lista.Insertar(tienda4)
-	//lista.Insertar(tienda5)
-
-	//lista.Imprimir()
-	//lista.Buscar(1)
-	//lista.Eliminar(2)
-	//lista.Imprimir()
-
 	//Crear el enrutador
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", indexRoute)
@@ -89,15 +72,38 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	var c_tiendas int = 0
 
 	for _, d := range data.Data {
-		index = append(index, d.Indice)
+		//index = append(index, d.Indice)
 		for _, dep := range d.Departamentos {
-			departamentos = append(departamentos, d.Departamentos[c_dep].Nombre)
+			//departamentos = append(departamentos, d.Departamentos[c_dep].Nombre)
+			lista1 = Estructura.Nueva_Lista()
+			lista2 = Estructura.Nueva_Lista()
+			lista3 = Estructura.Nueva_Lista()
+			lista4 = Estructura.Nueva_Lista()
+			lista5 = Estructura.Nueva_Lista()
 			for _, t := range dep.Tiendas {
-				t.Id = t.Id + t.GenerarId(t.Nombre)
+				
 				data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Id = t.GenerarId(t.Nombre)
-				tiendas = append(tiendas, d.Departamentos[c_dep].Tiendas[c_tiendas])
-				c_tiendas++
+				//tiendas = append(tiendas, d.Departamentos[c_dep].Tiendas[c_tiendas])
+				if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 1{
+					lista1.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
+				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 2{
+					lista2.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
+				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 3{
+					lista3.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
+				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 4{
+					lista4.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
+				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 5{
+					lista5.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])
+				}else{
+					fmt.Println("El campo esta vacio o pudo haber ocurrido un error")
+				}
+				c_tiendas ++
 			}
+			listas = append(listas, lista1)
+			listas = append(listas, lista2)
+			listas = append(listas, lista3)
+			listas = append(listas, lista4)
+			listas = append(listas, lista5)
 			c_tiendas = 0
 			c_dep++
 		}
@@ -106,15 +112,18 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	}
 	c_datos = 0
 
-	//A fmt.Println(data)
+	
 	datos = append(datos, data)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(datos)
 
+	for pos, lis := range listas{
+		lis.Imprimir()
+		fmt.Println("LA POSICION DE ESTA LISTA ES: ", pos)
+	}
 	
-	for _, indice := range index{
+	/*for _, indice := range index{
 		fmt.Println("INDICE: ", indice)
 	}
 	for _, depa := range departamentos{
@@ -124,14 +133,15 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("TIENDA: ", tienda)
 	}
 
-	depfinal := RemoveDuplicatesFromSlice(departamentos)
+	epfinal := RemoveDuplicatesFromSlice(departamentos)
 	departamentos = depfinal
 	fmt.Println(departamentos)
+	*/
 	
 }
 
 //Definir una funcion que elimine los repetidos en el array de departamentos
-func RemoveDuplicatesFromSlice(s []string) []string {
+/*func RemoveDuplicatesFromSlice(s []string) []string {
 	m := make(map[string]bool)
 	for _, item := range s {
 			if _, ok := m[item]; ok {
@@ -147,4 +157,5 @@ func RemoveDuplicatesFromSlice(s []string) []string {
 			result = append(result, item)
 	}
 	return result
-}
+}*/
+
