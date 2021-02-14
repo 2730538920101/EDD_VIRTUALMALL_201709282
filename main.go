@@ -101,13 +101,14 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 				}
 				c_tiendas ++
 			}
+			
+			c_tiendas = 0
+			c_dep++
 			listas = append(listas, lista1)
 			listas = append(listas, lista2)
 			listas = append(listas, lista3)
 			listas = append(listas, lista4)
 			listas = append(listas, lista5)
-			c_tiendas = 0
-			c_dep++
 		}
 		c_dep = 0
 		c_datos++
@@ -127,7 +128,7 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 
 	depfinal := RemoveDuplicatesFromSlice(departamentos)
 	departamentos = depfinal
-
+	fmt.Println(len(departamentos))
 }
 
 //Definir una funcion que elimine los repetidos en el array de departamentos
