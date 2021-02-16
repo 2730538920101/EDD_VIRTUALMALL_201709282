@@ -1,0 +1,54 @@
+digraph G {
+rankdir = LR; 
+	node [shape=record, color=black]; 
+label = "Estructura";
+color=black;
+		n_0[label = "NO HAY LISTA"];
+		n_1[label = "NO HAY LISTA"];
+		n_2[label = "NO HAY LISTA"];
+		n_3[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_0{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_3->Lista_0;
+Lista_0->"Amador";
+}
+		n_4[label = "LISTA CON:2ELEMENTOS"];
+subgraph Lista_1{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+"Aurora"->"Armados";
+n_4->Lista_1;
+Lista_1->"Aurora";
+}
+		n_5[label = "NO HAY LISTA"];
+		n_6[label = "NO HAY LISTA"];
+		n_7[label = "NO HAY LISTA"];
+		n_8[label = "NO HAY LISTA"];
+		n_9[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_2{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_9->Lista_2;
+Lista_2->"A comer todo";
+}
+		n_10[label = "NO HAY LISTA"];
+		n_11[label = "NO HAY LISTA"];
+		n_12[label = "NO HAY LISTA"];
+		n_13[label = "NO HAY LISTA"];
+		n_14[label = "NO HAY LISTA"];
+n_0->n_1;
+n_1->n_2;
+n_2->n_3;
+n_3->n_4;
+n_4->n_5;
+n_5->n_6;
+n_6->n_7;
+n_7->n_8;
+n_8->n_9;
+n_9->n_10;
+n_10->n_11;
+n_11->n_12;
+n_12->n_13;
+n_13->n_14;
+}

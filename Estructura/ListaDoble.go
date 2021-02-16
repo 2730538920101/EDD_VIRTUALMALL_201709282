@@ -4,6 +4,10 @@ package Estructura
 import (
 	"fmt"
 	"../Tiendas"
+	"log"
+	"os"
+	"os/exec"
+	"strconv"
 )
 
 //Definir la structura Nodo que contendra como atributo una estructura de tipo Tienda
@@ -23,6 +27,14 @@ type Lista struct{
 	//declarar una variable para el tamaño de la lista
 	tam int
 }
+//Metodo que verifica si esta vacia
+func (l *Lista)Es_Vacia() bool{
+	if l.inicio == nil && l.ultimo == nil{
+		return true
+	}
+	return false
+}
+
 
 //Definir una funcion para crear una nueva lista
 func Nueva_Lista() *Lista{
@@ -109,4 +121,92 @@ func (l *Lista) Eliminar(Identificador int){
 	}
 	//Restar un elemento del contador del tamaño de la lista
 	l.tam --
+}
+
+//Definir una funcion para ordenar las listas por Id
+func (l *Lista)Ordenar(){
+	aux := l.inicio
+	var temp *Tiendas.Tienda 
+	for aux != nil{
+		aux2 := aux.siguiente
+		for aux2 != nil{
+			if aux2.NodoTienda.Id < aux.NodoTienda.Id{
+				temp = aux.NodoTienda
+				aux.NodoTienda = aux2.NodoTienda
+				aux2.NodoTienda = temp
+			}
+			
+
+			aux2 = aux2.siguiente
+		}
+		aux = aux.siguiente
+	}
+}
+
+
+
+//Definir una funcion para graficar el vector
+func Graph(listas[] *Lista){
+	os.Create("Estructura/GraficaPila.dot")
+	graphdot := getFile("Estructura/GraficaPila.dot")
+	fmt.Fprintf(graphdot,"digraph G {\n")
+	fmt.Fprintf(graphdot,"rankdir = LR; \n")
+	fmt.Fprintf(graphdot,"\tnode [shape=record, color=black]; \n")
+	fmt.Fprintf(graphdot,"label = \"Estructura\";\n")
+	fmt.Fprintf(graphdot,"color=black;\n")
+	var text_aux string = ""
+	var cont = 0
+	var contador = 0
+	
+	for _, lis := range listas{
+		if lis.Es_Vacia(){
+			text_aux = "\t\tn_" + strconv.Itoa(cont) + "[label = \"NO HAY LISTA\"];\n"
+			fmt.Fprintf(graphdot, text_aux)
+			cont ++
+		}else{
+			text_aux = "\t\tn_" + strconv.Itoa(cont) + "[label = \"LISTA CON:"+ strconv.Itoa(lis.tam) +"ELEMENTOS\"];\n"
+			fmt.Fprintf(graphdot, text_aux)
+			
+			aux := lis.inicio
+			text_aux = "subgraph Lista_"+strconv.Itoa(contador)+"{\n"
+			fmt.Fprintf(graphdot, text_aux)
+			fmt.Fprintf(graphdot,"rankdir = UD; \n")
+			fmt.Fprintf(graphdot, "\tnode [shape=record, fillcolor =\"blue\", style =\"filled\", color=black]; \n")
+			for aux != nil{
+				if aux.siguiente != nil{
+					fmt.Fprintf(graphdot, "\""+ aux.NodoTienda.Nombre+"\"->\""+ aux.siguiente.NodoTienda.Nombre +"\";\n")
+				}
+				
+				aux = aux.siguiente
+				
+			}
+			contador ++
+			text_aux = "n_" + strconv.Itoa(cont) + "->Lista_" + strconv.Itoa(contador-1)+ ";\n"
+			fmt.Fprintf(graphdot, text_aux)
+			text_aux = "Lista_" + strconv.Itoa(contador -1) + "->" + "\""+ lis.inicio.NodoTienda.Nombre+"\";\n"
+			fmt.Fprintf(graphdot, text_aux)
+			fmt.Fprintf(graphdot, "}\n")
+			
+			
+			
+			cont ++
+		}
+	}
+	for i:= 0; i< cont-1; i++{
+		text_aux = "n_" + strconv.Itoa(i) + "->n_" + strconv.Itoa(i+1)+ ";\n"
+		fmt.Fprintf(graphdot, text_aux)
+		
+	}
+	fmt.Fprintf(graphdot, "}\n")
+	exec.Command("dot", "-Tpng", "Estructura/GraficaPila.dot", "-o", "Estructura/GraficaPila.png").Output()
+	graphdot.Close()
+}
+
+//Definir una funcion para crear un archivo
+func getFile(path string) *os.File{
+	file, err := os.OpenFile(path, os.O_RDWR,0775)
+	if err != nil{
+		log.Fatal(err)
+	}
+	return file
 }

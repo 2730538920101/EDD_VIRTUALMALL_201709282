@@ -14,8 +14,10 @@ import (
 )
 //Declarar una variable de tipo arreglo para almacenar los indices
 var index [] string
+var tamind int
 //Declarar una variable de tipo arreglo para almacenar los departamentos
 var departamentos [] string
+var tamdep int
 
 //Declarar una variable de tipo arreglo para almacenar los datos
 var datos [] Tiendas.Inicio
@@ -26,6 +28,7 @@ var lista2 *Estructura.Lista
 var lista3 *Estructura.Lista
 var lista4 *Estructura.Lista
 var lista5 *Estructura.Lista
+
 var listas [] *Estructura.Lista
 
 
@@ -43,6 +46,7 @@ func main(){
 	router.HandleFunc("/", indexRoute)
 	router.HandleFunc("/cargartienda", CargarTiendas).Methods("POST")
 	router.HandleFunc("/vertiendas", ConsultarTiendas).Methods("GET")
+	router.HandleFunc("/getArreglo", getArreglo).Methods("GET")
 	log.Fatal(http.ListenAndServe(":3000", router))
 	
 
@@ -56,6 +60,12 @@ func ConsultarTiendas(w http.ResponseWriter, r *http.Request){
 //Definir una ruta de inicio
 func indexRoute(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Proyecto fase 1 desde el servidor")
+}
+
+//Definir una funcion para cargar la imagen del vector
+func getArreglo(w http.ResponseWriter, r *http.Request){
+	Estructura.Graph(listas)
+	fmt.Fprintf(w, "Se ha generado exitosamente el grafico")
 }
 
 //Definir una funcion para Cargar las tiendas
@@ -81,6 +91,7 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 			lista3 = Estructura.Nueva_Lista()
 			lista4 = Estructura.Nueva_Lista()
 			lista5 = Estructura.Nueva_Lista()
+			
 			departamentos = append(departamentos, data.Data[c_datos].Departamentos[c_dep].Nombre)
 			for _, t := range dep.Tiendas {
 				
@@ -104,11 +115,17 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 			
 			c_tiendas = 0
 			c_dep++
+			lista1.Ordenar()
+			lista2.Ordenar()
+			lista3.Ordenar()
+			lista4.Ordenar()
+			lista5.Ordenar()
 			listas = append(listas, lista1)
 			listas = append(listas, lista2)
 			listas = append(listas, lista3)
 			listas = append(listas, lista4)
 			listas = append(listas, lista5)
+
 		}
 		c_dep = 0
 		c_datos++
@@ -128,7 +145,10 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 
 	depfinal := RemoveDuplicatesFromSlice(departamentos)
 	departamentos = depfinal
-	fmt.Println(len(departamentos))
+	tamdep = len(departamentos)
+	tamind = len(index)
+	fmt.Println("INDEICES: ",tamind,"DEPARTAMENTOS: ",tamdep)
+	
 }
 
 //Definir una funcion que elimine los repetidos en el array de departamentos
