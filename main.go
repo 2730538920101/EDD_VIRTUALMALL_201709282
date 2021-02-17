@@ -12,14 +12,13 @@ import (
 	
 	
 )
-//Declarar una variable de tipo arreglo para almacenar los indices
-var index [] string
-var tamind int
-//Declarar una variable de tipo arreglo para almacenar los departamentos
-var departamentos [] string
-var tamdep int
+
 
 //Declarar una variable de tipo arreglo para almacenar los datos
+var departamentos[] string
+var index[] string 
+var tamdep int
+var tamind int
 var datos [] Tiendas.Inicio
 var data Tiendas.Inicio
 //Declarar la variables de tipo ListaDoble
@@ -28,16 +27,8 @@ var lista2 *Estructura.Lista
 var lista3 *Estructura.Lista
 var lista4 *Estructura.Lista
 var lista5 *Estructura.Lista
-
+var Tienda_Esp *Tiendas.Busc_Esp
 var listas [] *Estructura.Lista
-
-
-var tienda1 *Tiendas.Tienda
-var tienda2 *Tiendas.Tienda
-var tienda3 *Tiendas.Tienda
-var tienda4 *Tiendas.Tienda
-var tienda5 *Tiendas.Tienda
-
 
 func main(){
 	fmt.Println("Proyecto de Estructura de Datos, Fase 1")
@@ -45,8 +36,10 @@ func main(){
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", indexRoute)
 	router.HandleFunc("/cargartienda", CargarTiendas).Methods("POST")
+	router.HandleFunc("/TiendaEspecifica", TiendaEspecifica).Methods("POST")
 	router.HandleFunc("/vertiendas", ConsultarTiendas).Methods("GET")
 	router.HandleFunc("/getArreglo", getArreglo).Methods("GET")
+	//router.HandleFunc("id/{Id}/", Buscar_Posicion).Methods("GET")
 	log.Fatal(http.ListenAndServe(":3000", router))
 	
 
@@ -68,6 +61,57 @@ func getArreglo(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Se ha generado exitosamente el grafico")
 }
 
+//Definir una funcion para Buscar por tienda especifica
+func TiendaEspecifica(w http.ResponseWriter, r *http.Request){
+	reqBody,err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
+	}
+	json.Unmarshal(reqBody, &Tienda_Esp)
+	var ind int
+	var dep [] int
+	var cal = Tienda_Esp.Calificacion -1
+	var pos [] int
+	//Obtener todos los indices y guardar la posicion donde se encontro coincidencia
+	for a, indice := range index{
+		b := []byte(Tienda_Esp.Nombre)
+		indi := string(b[0])
+		if indice == indi{
+			ind = a 
+			fmt.Println(ind)
+		}
+	}
+	//Obtener todos los departamentos y guardar las posiciones donde hay coincidencias
+	for p, depa := range departamentos{
+		if depa == Tienda_Esp.Departamento{
+			dep = append(dep, p)
+			fmt.Println(p)
+		}
+	}
+	for _, t := range dep{
+		k := cal + len(index) * (t*len(departamentos)+ ind)
+		fmt.Println(k)
+		pos = append(pos, k)
+	}
+	for _, p := range pos{
+		fmt.Println(p)
+	}
+	if listas != nil{
+		//Recorrer el vector para encontrar la tienda dentro de las listas
+		for _, dat := range pos{
+			info := listas[dat].Buscar(Tienda_Esp.Nombre)
+			if info != nil{
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				json.NewEncoder(w).Encode(info)
+			}
+		}
+	}else{
+		fmt.Fprintf(w, "Aun no ha cargado la informacion al vector")
+	}
+	
+}
+
 //Definir una funcion para Cargar las tiendas
 func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -85,18 +129,17 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	for _, d := range data.Data {
 		index = append(index, d.Indice)
 		for _, dep := range d.Departamentos {
-			//departamentos = append(departamentos, d.Departamentos[c_dep].Nombre)
+			departamentos = append(departamentos, d.Departamentos[c_dep].Nombre)
 			lista1 = Estructura.Nueva_Lista()
 			lista2 = Estructura.Nueva_Lista()
 			lista3 = Estructura.Nueva_Lista()
 			lista4 = Estructura.Nueva_Lista()
 			lista5 = Estructura.Nueva_Lista()
 			
-			departamentos = append(departamentos, data.Data[c_datos].Departamentos[c_dep].Nombre)
+			
 			for _, t := range dep.Tiendas {
 				
 				data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Id = t.GenerarId(t.Nombre)
-				//tiendas = append(tiendas, d.Departamentos[c_dep].Tiendas[c_tiendas])
 				if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 1{
 					lista1.Insertar(&d.Departamentos[c_dep].Tiendas[c_tiendas])	
 				}else if data.Data[c_datos].Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 2{
@@ -112,9 +155,6 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 				}
 				c_tiendas ++
 			}
-			
-			c_tiendas = 0
-			c_dep++
 			lista1.Ordenar()
 			lista2.Ordenar()
 			lista3.Ordenar()
@@ -125,8 +165,11 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 			listas = append(listas, lista3)
 			listas = append(listas, lista4)
 			listas = append(listas, lista5)
-
+			c_tiendas = 0
+			c_dep++
+			
 		}
+		
 		c_dep = 0
 		c_datos++
 	}
@@ -142,7 +185,12 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 		lis.Imprimir()
 		fmt.Println("LA POSICION DE ESTA LISTA ES: ", pos)
 	}
-
+	for _, lis := range index{
+		fmt.Println(lis)
+	}
+	for _, lis := range departamentos{
+		fmt.Println(lis)
+	}
 	depfinal := RemoveDuplicatesFromSlice(departamentos)
 	departamentos = depfinal
 	tamdep = len(departamentos)
@@ -150,7 +198,6 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("INDEICES: ",tamind,"DEPARTAMENTOS: ",tamdep)
 	
 }
-
 //Definir una funcion que elimine los repetidos en el array de departamentos
 func RemoveDuplicatesFromSlice(s []string) []string {
 	m := make(map[string]bool)
@@ -169,3 +216,4 @@ func RemoveDuplicatesFromSlice(s []string) []string {
 	}
 	return result
 }
+

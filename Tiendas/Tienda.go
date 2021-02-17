@@ -1,15 +1,20 @@
 //En este paquete definimir la estructura Tienda que tendra los datos de las tiendas
 package Tiendas
-//Importar los paquetes necesarios
-import "fmt"
+
 //Definir la structura Tienda con sus atributos y señalando que pueden venir en formato json
 type Tienda struct{
 	//Definir un atributo ID para obtener el codigo ascii del nombre y poder hacer el ordenamiento
 	Id int 
-	Nombre string `json:"Nombre, omitempty"`
-	Descripcion string `json:"Descripcion, omitempty"`
-	Contacto string `json:"Contacto, omitempty"`
-	Calificacion int `json:"Calificacion, omitempty"`
+	Nombre string `json:"Nombre"`
+	Descripcion string `json:"Descripcion"`
+	Contacto string `json:"Contacto"`
+	Calificacion int `json:"Calificacion"`
+}
+//Definir una estructura para las busquedas por tienda especifica
+type Busc_Esp struct{
+	Departamento string `json: "Departamento"`
+	Nombre string `json: "Nombre"`
+	Calificacion int `json: "Calificacion"`
 }
 //Definir una funcion que genere el Id de las tiendas basados en el codigo ascii para odenarlos al ser insertados en la lista
 func (t *Tienda) GenerarId(Nombre string) int{
@@ -28,21 +33,16 @@ func (t *Tienda) GenerarId(Nombre string) int{
 }
 //Definir la estructura de los departamentos que contiene el nombre del departamento y un arrego de tiendas
 type Departamento struct{
-	Nombre string `json:"Nombre, omitempty"`
-	Tiendas [] Tienda `json:"Tiendas, omitempty"`
+	Nombre string `json:"Nombre"`
+	Tiendas [] Tienda `json:"Tiendas"`
 }
 //Definir la estructura Datos que contienen el nombre del indice y un arreglo de departamentos
 type Datos struct{
-	Indice string `json:"Indice, omitempty"`
-	Departamentos [] Departamento `json:"Departamentos, omitempty"`
+	Indice string `json:"Indice"`
+	Departamentos [] Departamento `json:"Departamentos"`
 }
 
 type Inicio struct{
-	Data []Datos `json:"Datos, omitempty"`
+	Data []Datos `json:"Datos"`
 }
 
-//Definir una funcion para crear nuevas tiendas
-func Nueva_Tienda(Id int, Nombre string, Descripcion string, Contacto string, Calificacion int) *Tienda{
-	fmt.Println("Se ha creado una nueva tienda exitosamene")
-	return &Tienda{Id, Nombre, Descripcion, Contacto, Calificacion}
-}

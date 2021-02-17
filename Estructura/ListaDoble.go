@@ -77,12 +77,12 @@ func (l *Lista)Imprimir(){
 }
 
 //Definir una funcion para buscar un nodo dentro de la lista
-func (l *Lista)Buscar(Identificador int) *Nodo{
+func (l *Lista)Buscar(Nombre string) *Nodo{
 	//definir un nodo auxiliar para recorrer la lista
 	aux := l.inicio
 	for aux != nil{
 		//Verificar si el nodo en su propiedad de Id es igual al Id ingresado
-		if aux.NodoTienda.Id == Identificador{
+		if aux.NodoTienda.Nombre == Nombre{
 			//Si es igual devolver el nodo encontrado
 			fmt.Println("Se encontro el nodo")
 			return aux
@@ -96,9 +96,9 @@ func (l *Lista)Buscar(Identificador int) *Nodo{
 }
 
 //Definir un metodo para eliminar de la lista por Id del nodo
-func (l *Lista) Eliminar(Identificador int){
+func (l *Lista) Eliminar(Nombre string){
 	//Declarar un nodo auxiliar que busque el nodo y si existe para poder hacer las operaciones de comparacion
-	aux := l.Buscar(Identificador)
+	aux := l.Buscar(Nombre)
 	//Si el nodo encontrado esta al inicio de la lista
 	if l.inicio == aux{
 		l.inicio = aux.siguiente
