@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"encoding/json"
+	"net/http"
 )
 
 //Definir la structura Nodo que contendra como atributo una estructura de tipo Tienda
@@ -38,7 +40,7 @@ func (l *Lista)Es_Vacia() bool{
 
 //Definir una funcion para crear una nueva lista
 func Nueva_Lista() *Lista{
-
+	fmt.Println("Has creado una nueva calificacion para las tiendas")
 	return &Lista{nil,nil,0}
 }
 
@@ -62,6 +64,32 @@ func (l *Lista)Insertar(t *Tiendas.Tienda){
 	}
 	l.tam ++
 
+}
+
+//Definir una funcion para Decodificar cada tienda en la lista
+func (l *Lista)Decodificar(w http.ResponseWriter, r *http.Request){
+	if l.Es_Vacia(){
+		fmt.Fprintf(w, "LA LISTA NO CONTIENE TIENDAS")
+	}else{
+		aux := l.inicio
+		for aux != nil{
+			_= json.NewDecoder(r.Body).Decode(aux)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(aux)
+			
+			aux = aux.siguiente
+		}
+
+	}
+	
+	
+}
+
+//Definir una funcion que devuelva el tamaño de la lista
+func (l *Lista) GetTam() int{
+	fmt.Println(l.tam)
+	return l.tam
 }
 //Definir una funcion para imprimir la lista
 func (l *Lista)Imprimir(){
