@@ -69,7 +69,7 @@ func (l *Lista)Insertar(t *Tiendas.Tienda){
 //Definir una funcion para Decodificar cada tienda en la lista
 func (l *Lista)Decodificar(w http.ResponseWriter, r *http.Request){
 	if l.Es_Vacia(){
-		fmt.Fprintf(w, "LA LISTA NO CONTIENE TIENDAS")
+		fmt.Println("LA LISTA NO CONTIENE TIENDAS")
 	}else{
 		aux := l.inicio
 		for aux != nil{
@@ -127,28 +127,35 @@ func (l *Lista)Buscar(Nombre string) *Nodo{
 func (l *Lista) Eliminar(Nombre string){
 	//Declarar un nodo auxiliar que busque el nodo y si existe para poder hacer las operaciones de comparacion
 	aux := l.Buscar(Nombre)
-	//Si el nodo encontrado esta al inicio de la lista
-	if l.inicio == aux{
-		l.inicio = aux.siguiente
-		aux.siguiente.anterior = nil 
-		aux.siguiente = nil 
-		fmt.Println("Se ha eliminado un elemento de la lista")
-	//Si el nodo encontrado se encuentra al final de la lista
-	}else if l.ultimo == aux {
-		l.ultimo = aux.anterior
-		aux.anterior.siguiente = nil 
-		aux.anterior = nil 
-		fmt.Println("Se ha eliminado un elemento de la lista")
-	//Si el nodo encontrado esta entre los elementos de la lista pero no al principio ni al final
-	}else{
-		aux.anterior.siguiente = aux.siguiente
-		aux.siguiente.anterior = aux.anterior
-		aux.anterior = nil 
-		aux.siguiente = nil
-		fmt.Println("Se ha eliminado un elemento de la lista")
+	//Si el nodo encontrado esta al inicio de la lista	
+	if aux != nil{ 
+		if l.inicio == l.ultimo{
+			l.inicio = nil 
+			l.ultimo = nil
+		
+		}else if l.inicio == aux{
+			l.inicio = aux.siguiente
+			aux.siguiente.anterior = nil 
+			aux.siguiente = nil 
+			fmt.Println("Se ha eliminado un elemento de la lista")
+		//Si el nodo encontrado se encuentra al final de la lista
+		}else if l.ultimo == aux {
+			l.ultimo = aux.anterior
+			aux.anterior.siguiente = nil 
+			aux.anterior = nil 
+			fmt.Println("Se ha eliminado un elemento de la lista")
+		//Si el nodo encontrado esta entre los elementos de la lista pero no al principio ni al final
+		}else{
+			aux.anterior.siguiente = aux.siguiente
+			aux.siguiente.anterior = aux.anterior
+			aux.anterior = nil 
+			aux.siguiente = nil
+			fmt.Println("Se ha eliminado un elemento de la lista")
+		}
+		//Restar un elemento del contador del tamaño de la lista
+		l.tam --
 	}
-	//Restar un elemento del contador del tamaño de la lista
-	l.tam --
+	l.Imprimir()
 }
 
 //Definir una funcion para ordenar las listas por Id

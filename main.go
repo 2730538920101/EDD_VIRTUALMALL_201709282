@@ -28,6 +28,7 @@ var lista3 *Estructura.Lista
 var lista4 *Estructura.Lista
 var lista5 *Estructura.Lista
 var Tienda_Esp *Tiendas.Busc_Esp
+var Tienda_Elim *Tiendas.Eliminar_Esp
 var listas [] *Estructura.Lista
 
 func main(){
@@ -40,6 +41,8 @@ func main(){
 	router.HandleFunc("/vertiendas", ConsultarTiendas).Methods("GET")
 	router.HandleFunc("/getArreglo", getArreglo).Methods("GET")
 	router.HandleFunc("/id/{Id}/", Buscar_Posicion).Methods("GET")
+	router.HandleFunc("/Guardar", Guardar).Methods("GET")
+	router.HandleFunc("/Eliminar", Elim_Tienda).Methods("POST")
 	log.Fatal(http.ListenAndServe(":3000", router))
 	
 
@@ -60,7 +63,12 @@ func getArreglo(w http.ResponseWriter, r *http.Request){
 	Estructura.Graph(listas)
 	fmt.Fprintf(w, "Se ha generado exitosamente el grafico")
 }
-
+//Definir una funcion para decodificar el vector en formato json
+func Guardar(w http.ResponseWriter, r *http.Request){
+	for _, list := range listas{
+		list.Decodificar(w,r)
+	}
+}
 //Definir una funcion para Mostrar todas las tiendas en una posicion del vector cargada desde el servidor
 func Buscar_Posicion(w http.ResponseWriter, r *http.Request){
 	vars := mux.Vars(r)
@@ -72,13 +80,64 @@ func Buscar_Posicion(w http.ResponseWriter, r *http.Request){
 	
 	
 	if listas != nil{
-		//Recorrer el vector para encontrar la tienda dentro de las listas
-		listas[k].Decodificar(w, r)
+		if listas[k] != nil{
+			//Recorrer el vector para encontrar la tienda dentro de las listas
+			listas[k].Decodificar(w, r)
+		}else{
+			fmt.Fprintf(w, "NO SE HA ENCONTRADO LA TIENDA SOLICITADA")
+		}
+		
 	
 	}else{
 		fmt.Fprintf(w, "Aun no ha cargado la informacion al vector")
 	}
 }
+//Definir una funcion para Buscar por tienda especifica
+func Elim_Tienda(w http.ResponseWriter, r *http.Request){
+	reqBody,err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
+	}
+	json.Unmarshal(reqBody, &Tienda_Elim)
+	var ind int
+	var dep int
+	var cal = Tienda_Elim.Calificacion-1
+	//Obtener todos los indices y guardar la posicion donde se encontro coincidencia
+	for a, indice := range index{
+		b := []byte(Tienda_Elim.Nombre)
+		indi := string(b[0])
+		if indice == indi{
+			ind = a
+			
+		}
+	}
+	//Obtener todos los departamentos y guardar las posiciones donde hay coincidencias
+	for p, depa := range departamentos{
+		if depa == Tienda_Elim.Categoria{
+			dep = p
+			
+		}
+	}
+	fmt.Println(ind)
+	fmt.Println(dep)
+	fmt.Println(cal)
+	//Definir la ecuacion para encontrar elementos en el vector
+	pos := ((dep*(tamind)+ind)*(5))+cal
+	if listas != nil{
+		//Recorrer el vector para encontrar la tienda dentro de las listas
+		if listas[pos] != nil{
+			listas[pos].Eliminar(Tienda_Elim.Nombre)
+			fmt.Fprintf(w, "EL REGISTRO DE LA TIENDA HA SIDO ELIMINADO DE LA LISTA")
+		}else{
+			fmt.Fprintf(w, "EL REGISTRO QUE SOLICITA ELIMINAR NO EXISTE")
+		}
+	
+	}else{
+		fmt.Fprintf(w, "Aun no ha cargado la informacion al vector")
+	}
+	
+}
+
 
 //Definir una funcion para Buscar por tienda especifica
 func TiendaEspecifica(w http.ResponseWriter, r *http.Request){
@@ -156,7 +215,9 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 		
 			fmt.Println(f.Indice)
 			fmt.Println(d.Nombre)
-			f.Departamentos[c_dep].Tiendas[c_tiendas].Id = f.Departamentos[c_dep].Tiendas[c_tiendas].GenerarId(f.Departamentos[c_dep].Tiendas[c_tiendas].Nombre)
+			for c_tiendas, t := range f.Departamentos[c_dep].Tiendas{
+				f.Departamentos[c_dep].Tiendas[c_tiendas].Id = t.GenerarId(f.Departamentos[c_dep].Tiendas[c_tiendas].Nombre)
+			}
 			if f.Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 1{
 				lista1.Insertar(&f.Departamentos[c_dep].Tiendas[c_tiendas])
 			}else if f.Departamentos[c_dep].Tiendas[c_tiendas].Calificacion == 2{

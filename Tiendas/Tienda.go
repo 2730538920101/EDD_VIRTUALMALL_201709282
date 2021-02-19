@@ -16,6 +16,12 @@ type Busc_Esp struct{
 	Nombre string `json: "Nombre"`
 	Calificacion int `json: "Calificacion"`
 }
+//Definir una estructura para las eliminaciones por tienda especifica
+type Eliminar_Esp struct{
+	Nombre string `json: "Nombre"`
+	Categoria string `json: "Categoria"`
+	Calificacion int `json: "Calificacion"`
+}
 //Definir una funcion que genere el Id de las tiendas basados en el codigo ascii para odenarlos al ser insertados en la lista
 func (t *Tienda) GenerarId(Nombre string) int{
 	str := Nombre
