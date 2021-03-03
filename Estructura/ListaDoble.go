@@ -11,7 +11,13 @@ import (
 	"encoding/json"
 	"net/http"
 )
-
+//Definir una structura nodo que sera parte de la mtriz, este contiene una tienda
+type NodoM struct{
+	indice string `json:"Indice"`
+	depa string `json:"Departamento"`
+	List []*Lista
+	
+}
 //Definir la structura Nodo que contendra como atributo una estructura de tipo Tienda
 type Nodo struct{
 	//declarar los punteros de tipo nodo, uno para el anterior y uno para el siguiente
@@ -37,10 +43,18 @@ func (l *Lista)Es_Vacia() bool{
 	return false
 }
 
-
+//Definir una funcion para crear un nodo de tipo lista en la matriz simulada
+func NuevoNM(letra string, depa string) *NodoM{
+	listas := make([]*Lista,5)
+	listas[0] = Nueva_Lista()
+	listas[1] = Nueva_Lista()
+	listas[2] = Nueva_Lista()
+	listas[3] = Nueva_Lista()
+	listas[4] = Nueva_Lista()
+	return &NodoM{letra, depa, listas}
+}
 //Definir una funcion para crear una nueva lista
 func Nueva_Lista() *Lista{
-	fmt.Println("Has creado una nueva calificacion para las tiendas")
 	return &Lista{nil,nil,0}
 }
 
@@ -245,3 +259,4 @@ func getFile(path string) *os.File{
 	}
 	return file
 }
+
