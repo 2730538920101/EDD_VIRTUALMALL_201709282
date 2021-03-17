@@ -21,33 +21,33 @@ Lista_1->"Alejandro Hermanos";
 }
 		n_3[label = "NO HAY LISTA"];
 		n_4[label = "NO HAY LISTA"];
-		n_5[label = "LISTA CON:1ELEMENTOS"];
+		n_5[label = "NO HAY LISTA"];
+		n_6[label = "NO HAY LISTA"];
+		n_7[label = "LISTA CON:1ELEMENTOS"];
 subgraph Lista_2{
 rankdir = UD; 
 	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
-n_5->Lista_2;
-Lista_2->"Agosto, Hernández y Ojeda Asociados";
+n_7->Lista_2;
+Lista_2->"Borrego Rocha e Hijos";
 }
-		n_6[label = "NO HAY LISTA"];
-		n_7[label = "NO HAY LISTA"];
-		n_8[label = "NO HAY LISTA"];
-		n_9[label = "NO HAY LISTA"];
-		n_10[label = "NO HAY LISTA"];
-		n_11[label = "NO HAY LISTA"];
-		n_12[label = "LISTA CON:1ELEMENTOS"];
+		n_8[label = "LISTA CON:1ELEMENTOS"];
 subgraph Lista_3{
 rankdir = UD; 
 	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
-n_12->Lista_3;
-Lista_3->"Borrego Rocha e Hijos";
+n_8->Lista_3;
+Lista_3->"Baca y Viera";
 }
-		n_13[label = "LISTA CON:1ELEMENTOS"];
+		n_9[label = "NO HAY LISTA"];
+		n_10[label = "LISTA CON:1ELEMENTOS"];
 subgraph Lista_4{
 rankdir = UD; 
 	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
-n_13->Lista_4;
-Lista_4->"Baca y Viera";
+n_10->Lista_4;
+Lista_4->"Agosto, Hernández y Ojeda Asociados";
 }
+		n_11[label = "NO HAY LISTA"];
+		n_12[label = "NO HAY LISTA"];
+		n_13[label = "NO HAY LISTA"];
 		n_14[label = "NO HAY LISTA"];
 		n_15[label = "NO HAY LISTA"];
 		n_16[label = "LISTA CON:1ELEMENTOS"];

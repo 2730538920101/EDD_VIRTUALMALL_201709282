@@ -3,6 +3,10 @@ package Estructura
 import (
 	"fmt"
 	"../Tiendas"
+	"log"
+	"os"
+	"strconv"
+	"os/exec"
 )
 
 // nodo del arbol
@@ -126,7 +130,8 @@ func (ar *Arbol) RetornarProf() int {
 /*****************************RECORRIDOS**********************/
 //Metodo recursivo para recorrer Inorden
 // IZQ - RAIZ - DERECHA
-func inorden(raia *NodoAVL) {
+
+func inorden(raia *NodoAVL){
 	if raia.izq != nil {
 		inorden(raia.izq)
 	}
@@ -136,13 +141,61 @@ func inorden(raia *NodoAVL) {
 	if raia.der != nil {
 		inorden(raia.der)
 	}
+
 }
 
 //metodo que retorna el recorrido
-func (ar *Arbol) RecorridoInorden() {
+func (ar *Arbol) RecorridoInorden(){
 	inorden(ar.raiz)
 	fmt.Println("Termino el recorrido")
 }
+
+func gio(r *NodoAVL, arch *os.File){
+	if r.izq != nil{
+		fmt.Fprintf(arch,"\t\t"+strconv.Itoa(r.izq.valor.Codigo)+"->"+strconv.Itoa(r.valor.Codigo)+"\n")
+		gio(r.izq,arch)
+	}
+	
+	if r.der != nil{
+		fmt.Fprintf(arch,"\t\t"+strconv.Itoa(r.der.valor.Codigo)+"->"+strconv.Itoa(r.valor.Codigo)+"\n")
+		gio(r.der,arch)
+	}
+}
+func (ar *Arbol)GraficarIo(arch *os.File){
+
+	gio(ar.raiz,arch)
+	
+	
+}
+
+func GraficarAvl(pro[] *Arbol){
+	os.Create("Estructura/GraficaAvl.dot")
+	graphdot := getFileAvl("Estructura/GraficaAvl.dot")
+	fmt.Fprintf(graphdot, "digraph G{\n")
+	fmt.Fprintf(graphdot, "\n")
+	fmt.Fprintf(graphdot, "ranckdir = UD;\n")
+	fmt.Fprintf(graphdot, "\n")
+	for j:=0; j<len(pro); j++{
+		fmt.Fprintf(graphdot, "\t"+"subgraph avl_"+strconv.Itoa(j)+"{\n")
+		pro[j].GraficarIo(graphdot)
+		fmt.Fprintf(graphdot,"\n}\n")
+		
+	}
+	fmt.Fprintf(graphdot, "}")
+	exec.Command("dot", "-Tpng", "Estructura/GraficaAvl.dot", "-o", "Estructura/GraficaAvl.png").Output()
+	graphdot.Close()
+}
+
+
+//Definir una funcion para crear un archivo
+func getFileAvl(path string) *os.File{
+	file, err := os.OpenFile(path, os.O_RDWR,0775)
+	if err != nil{
+		log.Fatal(err)
+	}
+	return file
+}
+
 
 //Metodo recursivo para recorre Preorder
 func Preorder(raiz *NodoAVL) {

@@ -73,6 +73,8 @@ func main(){
 	router.HandleFunc("/Guardar", Guardar).Methods("GET")
 	router.HandleFunc("/Eliminar", Elim_Tienda).Methods("DELETE")
 	router.HandleFunc("/CargarInventario",CargarInventario).Methods("POST")
+	//router.HandleFunc("/api/verInventario", verInventario).Methods("GET")
+	router.HandleFunc("/api/verArbol",verArbol).Methods("GET")
 	router.HandleFunc("/CargarPedido",CargarPedido).Methods("POST")
 	router.HandleFunc("/cargar", Prueba).Methods("POST")
 	router.HandleFunc("/api/ver",verCargar).Methods("GET")
@@ -93,7 +95,23 @@ func CargarPedido(w http.ResponseWriter, r *http.Request){
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&Pedidos)
 }
+//Definir una funcion para graficar los arboles
+func verArbol(w http.ResponseWriter, r *http.Request){
+	//Estructura.GraficarAvl(ProdAvl)
+	
+	Estructura.GraficarAvl(ProdAvl)
+	
+	fmt.Fprintf(w,"SE HA CREADO EL GRAFICO DE LOS ARBOLES AVL")
+}
+
 //Definir un metodo post para cargar los inventarios
+/*
+func verInventario(w http.ResponseWriter, r *http.Request){
+	
+}*/
+
+
+
 func CargarInventario(w http.ResponseWriter, r *http.Request){
 	
 	reqBody,err := ioutil.ReadAll(r.Body)
@@ -135,8 +153,9 @@ func CargarInventario(w http.ResponseWriter, r *http.Request){
 		arbol := Estructura.NewArbol()
 		for j:=0; j<len(Tiendaprod);j++{
 			arbol.InsertarNodoAVL(&Tiendaprod[j])
-			ProdAvl = append(ProdAvl, arbol)
+			
 		}
+		ProdAvl = append(ProdAvl, arbol)
 		fmt.Println("Se agregaron productos en: ", pos)
 		vector[pos].AgregarProd(Tiendaprod,Tiendanom, Tiendacal)
 	}
@@ -326,6 +345,7 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	cantindex := len(data.Data)
 	cantdep := len(data.Data[0].Departamentos)
 	matrix := make([][]*Estructura.NodoM, cantindex)
+	vector = make([]*Estructura.Lista, cantindex*cantdep*5)
 	for i:= 0; i < cantindex; i++{
 		matrix[i] = make([]*Estructura.NodoM, cantdep)
 		letra := string((data.Data[i].Indice)[0])
@@ -369,10 +389,12 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 			
 		}
 	}
+	
 	for i:=0; i< cantindex; i++{
 		for j:=0; j< cantdep; j++{
 			for k:=0; k<5; k++{
-				vector = append(vector, matrix[i][j].List[k])
+				pos := ((j*(cantindex)+i)*(5))+k
+				vector[pos] = matrix[i][j].List[k]
 			}
 		}
 	}
