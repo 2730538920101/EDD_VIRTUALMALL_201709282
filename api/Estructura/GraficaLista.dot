@@ -1,0 +1,82 @@
+digraph G {
+rankdir = LR; 
+	node [shape=record, color=black]; 
+label = "Estructura";
+color=black;
+		n_0[label = "NO HAY LISTA"];
+		n_1[label = "LISTA CON:2ELEMENTOS"];
+subgraph Lista_0{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+"Alvarez Loya S.A."->"Agosto, Hernández y Ojeda Asociados";
+n_1->Lista_0;
+Lista_0->"Alvarez Loya S.A.";
+}
+		n_2[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_1{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_2->Lista_1;
+Lista_1->"Alejandro Hermanos";
+}
+		n_3[label = "NO HAY LISTA"];
+		n_4[label = "NO HAY LISTA"];
+		n_5[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_2{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_5->Lista_2;
+Lista_2->"Agosto, Hernández y Ojeda Asociados";
+}
+		n_6[label = "NO HAY LISTA"];
+		n_7[label = "NO HAY LISTA"];
+		n_8[label = "NO HAY LISTA"];
+		n_9[label = "NO HAY LISTA"];
+		n_10[label = "NO HAY LISTA"];
+		n_11[label = "NO HAY LISTA"];
+		n_12[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_3{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_12->Lista_3;
+Lista_3->"Borrego Rocha e Hijos";
+}
+		n_13[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_4{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_13->Lista_4;
+Lista_4->"Baca y Viera";
+}
+		n_14[label = "NO HAY LISTA"];
+		n_15[label = "NO HAY LISTA"];
+		n_16[label = "LISTA CON:1ELEMENTOS"];
+subgraph Lista_5{
+rankdir = UD; 
+	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
+n_16->Lista_5;
+Lista_5->"Borrego Rocha e Hijos";
+}
+		n_17[label = "NO HAY LISTA"];
+		n_18[label = "NO HAY LISTA"];
+		n_19[label = "NO HAY LISTA"];
+n_0->n_1;
+n_1->n_2;
+n_2->n_3;
+n_3->n_4;
+n_4->n_5;
+n_5->n_6;
+n_6->n_7;
+n_7->n_8;
+n_8->n_9;
+n_9->n_10;
+n_10->n_11;
+n_11->n_12;
+n_12->n_13;
+n_13->n_14;
+n_14->n_15;
+n_15->n_16;
+n_16->n_17;
+n_17->n_18;
+n_18->n_19;
+}

@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"encoding/json"
 	"net/http"
+	
+	
 )
 //Definir una structura nodo que sera parte de la mtriz, este contiene una tienda
 type NodoM struct{
@@ -81,21 +83,28 @@ func (l *Lista)Insertar(t *Tiendas.Tienda){
 }
 
 //Definir una funcion para Decodificar cada tienda en la lista
-func (l *Lista)Decodificar(w http.ResponseWriter, r *http.Request){
-	if l.Es_Vacia(){
-		fmt.Println("LA LISTA NO CONTIENE TIENDAS")
-	}else{
-		aux := l.inicio
-		for aux != nil{
-			_= json.NewDecoder(r.Body).Decode(aux)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(aux)
-			
-			aux = aux.siguiente
+func (l *Lista)Decodificar(w http.ResponseWriter, r *http.Request)string{
+	aux := l.inicio
+	var salida = ""
+	for aux != nil{
+		s, err := json.Marshal(aux.NodoTienda)
+		if err != nil {
+			log.Print(err)
 		}
 
+		if aux != l.ultimo{
+		
+			salida = salida + string(s)+",\n"
+			
+		}else{
+			salida = salida+ string(s)+"\n"
+		
+			
+		}
+		aux = aux.siguiente
 	}
+	return salida
+
 	
 	
 }
@@ -135,6 +144,34 @@ func (l *Lista)Buscar(Nombre string) *Nodo{
 	//Si al terminar de leer la lista no lo encontro, se envia un msj y retorna el nodo aux apuntando a null
 	fmt.Println("No se encontro el nodo")
 	return aux
+}
+
+func (l *Lista)Buscar2(Nombre string, Calificacion int) *Nodo{
+	aux := l.inicio
+	for aux != nil{
+		//Verificar si el nodo en su propiedad de Id es igual al Id ingresado
+		if ((aux.NodoTienda.Nombre == Nombre)&&(aux.NodoTienda.Calificacion == Calificacion)){
+			//Si es igual devolver el nodo encontrado
+			fmt.Println("Se encontro el nodo")
+			return aux
+		}
+		//Si no lo encuentra en la lista, pasar al siguiente nodo
+		aux = aux.siguiente
+	}
+	//Si al terminar de leer la lista no lo encontro, se envia un msj y retorna el nodo aux apuntando a null
+	fmt.Println("No se encontro el nodo")
+	return aux
+	
+}
+
+//Definir un metodo para agregar los productos a las listas en la tienda respectiva
+func (l *Lista)AgregarProd(productos []Tiendas.Producto, nombreT string, cali int){
+	aux := l.Buscar2(nombreT, cali)
+	if aux != nil{
+		aux.NodoTienda.Productos = productos
+	}else{
+		fmt.Println("No se insertaron productos")
+	}
 }
 
 //Definir un metodo para eliminar de la lista por Id del nodo
@@ -247,7 +284,7 @@ func Graph(listas[] *Lista){
 		
 	}
 	fmt.Fprintf(graphdot, "}\n")
-	exec.Command("dot", "-Tpng", "Estructura/GraficaPila.dot", "-o", "Estructura/GraficaPila.png").Output()
+	exec.Command("dot", "-Tpng", "Estructura/GraficaLista.dot", "-o", "Estructura/GraficaLista.png").Output()
 	graphdot.Close()
 }
 

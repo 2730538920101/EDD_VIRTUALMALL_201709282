@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"strconv"
-	
+	"strings"
 	
 )
 
@@ -37,8 +37,10 @@ var producto1 *Tiendas.Producto
 var producto2 *Tiendas.Producto
 var producto3 *Tiendas.Producto
 var ListaS *Estructura.ListaSimple
+var tienda *Tiendas.Tienda 
 
-
+var ProdAvl []*Estructura.Arbol
+var tind map[string]interface{}
 func main(){
 	fmt.Println("Proyecto de Estructura de Datos, Fase 1")
 	//Crear el enrutador
@@ -63,15 +65,17 @@ func main(){
 	*/
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", indexRoute)
-	router.HandleFunc("/cargartienda", CargarTiendas).Methods("POST")
+	router.HandleFunc("/api/cargartienda", CargarTiendas).Methods("POST")
 	router.HandleFunc("/TiendaEspecifica", TiendaEspecifica).Methods("POST")
-	router.HandleFunc("/vertiendas", ConsultarTiendas).Methods("GET")
+	router.HandleFunc("/api/vertiendas", ConsultarTiendas).Methods("GET")
 	router.HandleFunc("/getArreglo", getArreglo).Methods("GET")
 	router.HandleFunc("/id/{Id}/", Buscar_Posicion).Methods("GET")
 	router.HandleFunc("/Guardar", Guardar).Methods("GET")
 	router.HandleFunc("/Eliminar", Elim_Tienda).Methods("DELETE")
 	router.HandleFunc("/CargarInventario",CargarInventario).Methods("POST")
 	router.HandleFunc("/CargarPedido",CargarPedido).Methods("POST")
+	router.HandleFunc("/cargar", Prueba).Methods("POST")
+	router.HandleFunc("/api/ver",verCargar).Methods("GET")
 	log.Fatal(http.ListenAndServe(":3000", router))
 	
 }
@@ -91,12 +95,55 @@ func CargarPedido(w http.ResponseWriter, r *http.Request){
 }
 //Definir un metodo post para cargar los inventarios
 func CargarInventario(w http.ResponseWriter, r *http.Request){
+	
 	reqBody,err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
 	}
 	json.Unmarshal(reqBody, &Inventario)
-	fmt.Println(&Inventario)
+	
+		//debo leer prod
+	for i:=0; i<len(Inventario.Inventarios);i++{
+		Tiendanom := Inventario.Inventarios[i].Tienda
+		Tiendadep := Inventario.Inventarios[i].Departamento
+		Tiendacal := Inventario.Inventarios[i].Calificacion
+		Tiendaprod := Inventario.Inventarios[i].Productos
+		var ind int = 0
+		var dep int = 0
+		var cal int = 0
+		for a, indice := range index{
+			b := []byte(Tiendanom)
+			indi := string(b[0])
+			if indice == indi{
+				ind = a
+				
+			}
+		}
+		for p, depa := range departamentos{
+			if depa == Tiendadep{
+				dep = p
+				
+			}
+		}
+		cal = Tiendacal -1
+		fmt.Println("IND: ", ind)
+		fmt.Println("DEP: ", dep)
+		fmt.Println("CAL: ", cal)
+		fmt.Println("TAMIND: ", tamind)
+		pos := ((dep*(tamind)+ind)*(5))+cal
+		fmt.Println("POS: ", pos)
+		arbol := Estructura.NewArbol()
+		for j:=0; j<len(Tiendaprod);j++{
+			arbol.InsertarNodoAVL(&Tiendaprod[j])
+			ProdAvl = append(ProdAvl, arbol)
+		}
+		fmt.Println("Se agregaron productos en: ", pos)
+		vector[pos].AgregarProd(Tiendaprod,Tiendanom, Tiendacal)
+	}
+
+	for _, v:= range vector{
+		v.Imprimir()
+	}
 	_= json.NewDecoder(r.Body).Decode(&Inventario)	
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -106,8 +153,9 @@ func CargarInventario(w http.ResponseWriter, r *http.Request){
 
 //Definir una funcion http GET para poder consultar el servidor y ver todas las tiendas
 func ConsultarTiendas(w http.ResponseWriter, r *http.Request){
-	w.Header().Set("Content-Type","application/json")
-	json.NewEncoder(w).Encode(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&tind)
 }
 
 //Definir una ruta de inicio
@@ -246,7 +294,27 @@ func TiendaEspecifica(w http.ResponseWriter, r *http.Request){
 	}
 	
 }
+func verCargar(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(tienda)
+}
 
+func Prueba(w http.ResponseWriter, r *http.Request) {
+	
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Ingrese una tienda valida")
+	}
+	json.Unmarshal(reqBody, &tienda)
+	fmt.Println(tienda)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&tienda)
+}
+
+var depli []string
+//var grjson []string
 //Definir una funcion para Cargar las tiendas
 func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -309,15 +377,31 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	departamentos = RemoveDuplicatesFromSlice(departamentos)
+
 	for _, li:= range vector{
-		li.Decodificar(w,r)
+		salida := li.Decodificar(w,r)
+		if salida !=""{
+			depli = append(depli, salida )	
+		}	
 	}
 	
-	for cont, l := range vector{
-		l.Imprimir()
-		fmt.Println("POS:", cont)
+	stjs := strings.Join(depli,",")
+	stjs = "{\n\"tiendas\":[\n"+stjs+"]\n}"
+	sal := []byte(stjs)
+	err2 := json.Unmarshal(sal, &tind)
+	if err2 != nil {
+		log.Print(err2)
 	}
+	fmt.Printf("%-v\n", tind)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&tind)
+	tamind = len(index)
 	
+	
+	
+	
+
 }
 //Definir una funcion que elimine los repetidos en el array de departamentos
 func RemoveDuplicatesFromSlice(s []string) []string {
