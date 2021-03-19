@@ -152,12 +152,12 @@ func (ar *Arbol) RecorridoInorden(){
 
 func gio(r *NodoAVL, arch *os.File){
 	if r.izq != nil{
-		fmt.Fprintf(arch,"\t\t"+strconv.Itoa(r.izq.valor.Codigo)+"->"+strconv.Itoa(r.valor.Codigo)+"\n")
+		fmt.Fprintf(arch,"\t\t"+strconv.Itoa(r.valor.Codigo)+"->"+strconv.Itoa(r.izq.valor.Codigo)+"\n")
 		gio(r.izq,arch)
 	}
 	
 	if r.der != nil{
-		fmt.Fprintf(arch,"\t\t"+strconv.Itoa(r.der.valor.Codigo)+"->"+strconv.Itoa(r.valor.Codigo)+"\n")
+		fmt.Fprintf(arch,"\t\t"+strconv.Itoa(r.valor.Codigo)+"->"+strconv.Itoa(r.der.valor.Codigo)+"\n")
 		gio(r.der,arch)
 	}
 }
@@ -176,7 +176,7 @@ func GraficarAvl(pro[] *Arbol){
 	fmt.Fprintf(graphdot, "ranckdir = UD;\n")
 	fmt.Fprintf(graphdot, "\n")
 	for j:=0; j<len(pro); j++{
-		fmt.Fprintf(graphdot, "\t"+"subgraph avl_"+strconv.Itoa(j)+"{\n")
+		fmt.Fprintf(graphdot, "\t"+"subgraph cluster_"+strconv.Itoa(j)+"{\n")
 		pro[j].GraficarIo(graphdot)
 		fmt.Fprintf(graphdot,"\n}\n")
 		

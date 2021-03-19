@@ -51,3 +51,13 @@ type Codigos struct{
 func NuevoProducto(nomb string,cod int, desc string, precio int, cant int, img string ) *Producto{
 	return &Producto{nomb, cod, desc, precio, cant, img}
 }
+
+//Definir una estructura para el carrito de compras
+type Carrito struct{
+	Tienda string `json: "Tienda"`
+	Dep int `json: "Dep"`
+	Calificacion int `json: "Calificacion"`
+	Nombre string `json: "Nombre"`
+	Codigo int `json: "Codigo"`
+	Cantidad int `json: "Cantidad"`
+}

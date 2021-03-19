@@ -127,6 +127,30 @@ func (l *Lista)Imprimir(){
 	fmt.Println("EL TAMAÑO DE LA LISTA ES: ", l.tam)
 }
 
+//funcion para buscar productos que devuelve la posicion del producto en su arreglo
+func (l * Lista)BuscarProd(Nombre string, Cod int, Nom string, Cant int)*Tiendas.Producto{
+	aux := l.inicio
+	for aux != nil{
+		if aux.NodoTienda.Nombre == Nombre{
+			p := aux.NodoTienda.Productos
+			for j:=0; j<len(p);j++{
+				if ((p[j].Codigo == Cod)&&(p[j].Nombre == Nom)){
+					if ((Cant <= p[j].Cantidad)&&(p[j].Cantidad>0)){
+						p[j].Cantidad = p[j].Cantidad - Cant
+						return &p[j]
+					}
+				}
+				
+			}
+		}
+		aux = aux.siguiente
+		
+		
+	}
+	return nil
+}
+
+
 //Definir una funcion para buscar un nodo dentro de la lista
 func (l *Lista)Buscar(Nombre string) *Nodo{
 	//definir un nodo auxiliar para recorrer la lista
@@ -134,6 +158,27 @@ func (l *Lista)Buscar(Nombre string) *Nodo{
 	for aux != nil{
 		//Verificar si el nodo en su propiedad de Id es igual al Id ingresado
 		if aux.NodoTienda.Nombre == Nombre{
+			//Si es igual devolver el nodo encontrado
+			fmt.Println("Se encontro el nodo")
+			return aux
+		}
+		//Si no lo encuentra en la lista, pasar al siguiente nodo
+		aux = aux.siguiente
+	}
+	//Si al terminar de leer la lista no lo encontro, se envia un msj y retorna el nodo aux apuntando a null
+	fmt.Println("No se encontro el nodo")
+	return aux
+}
+
+
+
+//Definir una funcion para buscar un nodo dentro de la lista por ID
+func (l *Lista)BuscarId(Id int) *Nodo{
+	//definir un nodo auxiliar para recorrer la lista
+	aux := l.inicio
+	for aux != nil{
+		//Verificar si el nodo en su propiedad de Id es igual al Id ingresado
+		if aux.NodoTienda.Id == Id{
 			//Si es igual devolver el nodo encontrado
 			fmt.Println("Se encontro el nodo")
 			return aux

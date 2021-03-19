@@ -31,7 +31,7 @@ var Tienda_Elim *Tiendas.Eliminar_Esp
 var Inventario Tiendas.InvInit
 
 //variable para cargar pedidos
-var Pedidos Tiendas.PedInit
+var Pedidos *Tiendas.PedInit
 //variables para los productos de prueba
 var producto1 *Tiendas.Producto
 var producto2 *Tiendas.Producto
@@ -39,30 +39,16 @@ var producto3 *Tiendas.Producto
 var ListaS *Estructura.ListaSimple
 var tienda *Tiendas.Tienda 
 
+var Prod *Tiendas.Carrito
 var ProdAvl []*Estructura.Arbol
 var tind map[string]interface{}
+
 func main(){
 	fmt.Println("Proyecto de Estructura de Datos, Fase 1")
 	//Crear el enrutador
 	
-	/*ListaS = Estructura.Nueva_ListaS()
+	ListaS = Estructura.Nueva_ListaS()
 	
-	//Productos de prueba
-	producto1 = Tiendas.NuevoProducto("zapato", 123, "los mejores zapatos", 500, 5,"www.zapatos.com")
-	producto2 = Tiendas.NuevoProducto("Carro",456, "los mejores carros", 10000, 8,"www.carros.com")
-	producto3 = Tiendas.NuevoProducto("Camisas", 789,"Las mejores camisas",58,14,"www.camisas.com")
-	
-	ListaS.Insertar(producto1)
-	ListaS.Insertar(producto2)
-	ListaS.Insertar(producto3)
-	
-	ListaS.Imprimir()
-	ListaS.Buscar_Simple(123)
-	ListaS.Eliminar_Simple(456)
-	ListaS.Eliminar_Simple(789)
-	ListaS.Eliminar_Simple(123)
-	ListaS.Imprimir()
-	*/
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", indexRoute)
 	router.HandleFunc("/api/cargartienda", CargarTiendas).Methods("POST")
@@ -73,14 +59,57 @@ func main(){
 	router.HandleFunc("/Guardar", Guardar).Methods("GET")
 	router.HandleFunc("/Eliminar", Elim_Tienda).Methods("DELETE")
 	router.HandleFunc("/CargarInventario",CargarInventario).Methods("POST")
-	//router.HandleFunc("/api/verInventario", verInventario).Methods("GET")
+	router.HandleFunc("/api/verInventario/{id}", verInventario).Methods("GET")
 	router.HandleFunc("/api/verArbol",verArbol).Methods("GET")
 	router.HandleFunc("/CargarPedido",CargarPedido).Methods("POST")
 	router.HandleFunc("/cargar", Prueba).Methods("POST")
 	router.HandleFunc("/api/ver",verCargar).Methods("GET")
+	router.HandleFunc("/InsertarCarrito",InsertarCarrito).Methods("PUT")
+	
 	log.Fatal(http.ListenAndServe(":3000", router))
 	
 }
+//Definir un metodo para insertar en el carrito
+func InsertarCarrito(w http.ResponseWriter, r *http.Request){
+	reqBody,err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
+	}
+	json.Unmarshal(reqBody, &Prod)
+	var ind int = 0
+	tiendanom := Prod.Tienda
+	for a, indice := range index{
+		b := []byte(tiendanom)
+		indi := string(b[0])
+		if indice == indi{
+			ind = a
+			
+		}
+	}
+	dep := Prod.Dep
+	cal := Prod.Calificacion-1
+	pos := ((dep*(tamind)+ind)*(5))+cal
+	cod := Prod.Codigo
+	nom := Prod.Nombre
+	cant := Prod.Cantidad
+	productoFinal :=vector[pos].BuscarProd(tiendanom, cod, nom, cant)
+	if productoFinal !=nil{
+		ListaS.Insertar(productoFinal)
+		ListaS.Imprimir()
+	}else{
+		fmt.Println("NO HAY PRODUCTO DISPONIBLE")
+	}
+	
+
+	_= json.NewDecoder(r.Body).Decode(&Prod)	
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&Prod)
+}
+
+
+
+
 
 //Definir un metodo post para cargar los pedidos
 func CargarPedido(w http.ResponseWriter, r *http.Request){
@@ -97,18 +126,34 @@ func CargarPedido(w http.ResponseWriter, r *http.Request){
 }
 //Definir una funcion para graficar los arboles
 func verArbol(w http.ResponseWriter, r *http.Request){
-	//Estructura.GraficarAvl(ProdAvl)
-	
 	Estructura.GraficarAvl(ProdAvl)
-	
 	fmt.Fprintf(w,"SE HA CREADO EL GRAFICO DE LOS ARBOLES AVL")
 }
 
 //Definir un metodo post para cargar los inventarios
-/*
+
 func verInventario(w http.ResponseWriter, r *http.Request){
+	vars := mux.Vars(r)
 	
-}*/
+	TiendaId, err := strconv.Atoi(vars["id"])
+	if err != nil{
+		fmt.Fprintf(w, "EL ID DE LA TIENDA ES INVALIDO")
+		return
+	}
+	fmt.Println("LA POSICION INGRESADA ES: ", TiendaId)
+	for i:=0; i<len(vector); i++{
+		busc := vector[i].BuscarId(TiendaId)
+		if busc != nil{
+			fmt.Println("PRODUCTOS: ", busc.NodoTienda.Productos)
+				
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(busc.NodoTienda)
+					
+		}
+	}
+
+}
 
 
 
@@ -188,10 +233,30 @@ func getArreglo(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Se ha generado exitosamente el grafico")
 }
 //Definir una funcion para decodificar el vector en formato json
+
 func Guardar(w http.ResponseWriter, r *http.Request){
-	for _, list := range vector{
-		list.Decodificar(w,r)
+	depli = nil
+	tind = nil
+	for _, li:= range vector{
+		salida := li.Decodificar(w,r)
+		if salida !=""{
+			depli = append(depli, salida )	
+		}	
 	}
+	
+	stjs := strings.Join(depli,",")
+	stjs = "{\n\"tiendas\":[\n"+stjs+"]\n}"
+	sal := []byte(stjs)
+	err2 := json.Unmarshal(sal, &tind)
+	if err2 != nil {
+		log.Print(err2)
+	}
+	fmt.Println("BANDERA")
+	fmt.Println()
+	fmt.Printf("%-v\n", tind)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&tind)
 }
 //Definir una funcion para Mostrar todas las tiendas en una posicion del vector cargada desde el servidor
 func Buscar_Posicion(w http.ResponseWriter, r *http.Request){
@@ -362,6 +427,7 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 				nombre := tienda.Nombre
 				data.Data[i].Departamentos[j].Tiendas[z].Id= data.Data[i].Departamentos[j].Tiendas[z].GenerarId(nombre)
 				tienda.Id= data.Data[i].Departamentos[j].Tiendas[z].GenerarId(nombre)
+				tienda.Dep=j
 				//desc := tienda.Descripcion
 				//contact := tienda.Contacto
 				cali := tienda.Calificacion

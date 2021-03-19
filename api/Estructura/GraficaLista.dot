@@ -43,7 +43,7 @@ subgraph Lista_4{
 rankdir = UD; 
 	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
 n_10->Lista_4;
-Lista_4->"Agosto, Hernández y Ojeda Asociados";
+Lista_4->"Agosto, Hernández y Ojeda Asociados teles";
 }
 		n_11[label = "NO HAY LISTA"];
 		n_12[label = "NO HAY LISTA"];
@@ -55,7 +55,7 @@ subgraph Lista_5{
 rankdir = UD; 
 	node [shape=record, fillcolor ="blue", style ="filled", color=black]; 
 n_16->Lista_5;
-Lista_5->"Borrego Rocha e Hijos";
+Lista_5->"Borrego Rocha e Hijos teles";
 }
 		n_17[label = "NO HAY LISTA"];
 		n_18[label = "NO HAY LISTA"];

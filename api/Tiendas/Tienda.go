@@ -5,6 +5,7 @@ package Tiendas
 type Tienda struct{
 	//Definir un atributo ID para obtener el codigo ascii del nombre y poder hacer el ordenamiento
 	Id int `json:"Id"`
+	Dep int `json:"Dep"`
 	Nombre string `json:"Nombre"`
 	Descripcion string `json:"Descripcion"`
 	Contacto string `json:"Contacto"`
