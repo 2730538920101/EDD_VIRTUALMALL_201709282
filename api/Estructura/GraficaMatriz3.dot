@@ -1,0 +1,41 @@
+digraph G {
+rankdir = TB; 
+node[shape = box, width=0.7, height=0.7, fillcolor="azure2" color="white" style= "filled"];
+edge[style = "bold"];
+
+	 node[label = "Capa: 3" fillcolor = "darkolivegreen1" pos= "-1,1!"]principal;
+
+	 node[label = "X: 13" fillcolor= "azure3" pos= "0,1!" shape = box]x13;
+
+	 node[label = "X: 30" fillcolor= "azure3" pos= "1,1!" shape = box]x30;
+x13 -> x30; 
+x30 -> x13; 
+principal -> x13;
+
+	 node[label = "Y: 0" fillcolor= "azure3" pos= "-1,-0!" shape = box]y0;
+
+	 node[label = "Y: 1" fillcolor= "azure3" pos= "-1,-1!" shape = box]y1;
+y0 -> y1; 
+y1 -> y0; 
+principal -> y0;
+
+	 node[label = " 13, 0
+ Cola tam: 4 " fillcolor= "azure2" pos = " 0, -0! " shape = box]"i13-0";
+ x13 -> "i13-0";
+
+ "i13-0" -> x13; 
+
+	 node[label = " 30, 1
+ Cola tam: 4 " fillcolor= "azure2" pos = " 1, -1! " shape = box]"i30-1";
+ x30 -> "i30-1";
+
+ "i30-1" -> x30; 
+
+ y0 -> "i13-0"
+
+ "i13-0" -> y0 
+
+ y1 -> "i30-1"
+
+ "i30-1" -> y1 
+}

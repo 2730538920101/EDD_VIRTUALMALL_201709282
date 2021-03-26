@@ -9,11 +9,13 @@ type Producto struct{
 	Precio int `json:"Precio"`
 	Cantidad int `json:"Cantidad"`
 	Imagen string `json:"Imagen"`
+	Ventas int `json:"Ventas"`
 }
 
 func (p *Producto) getCodigo() int{
 	return p.Codigo
 }
+
 
 //Definir una estructura inicial para los inventarios
 type InvInit struct{
@@ -48,8 +50,8 @@ type Codigos struct{
 }
 
 //Definir una funcion para crear un nuevo producto
-func NuevoProducto(nomb string,cod int, desc string, precio int, cant int, img string ) *Producto{
-	return &Producto{nomb, cod, desc, precio, cant, img}
+func NuevoProducto(nomb string,cod int, desc string, precio int, cant int, img string, vent int ) *Producto{
+	return &Producto{nomb, cod, desc, precio, cant, img,vent}
 }
 
 //Definir una estructura para el carrito de compras
@@ -61,3 +63,4 @@ type Carrito struct{
 	Codigo int `json: "Codigo"`
 	Cantidad int `json: "Cantidad"`
 }
+

@@ -1,0 +1,23 @@
+digraph G {
+rankdir = TB; 
+node[shape = box, width=0.7, height=0.7, fillcolor="azure2" color="white" style= "filled"];
+edge[style = "bold"];
+
+	 node[label = "Capa: 10" fillcolor = "darkolivegreen1" pos= "-1,1!"]principal;
+
+	 node[label = "X: 31" fillcolor= "azure3" pos= "0,1!" shape = box]x31;
+principal -> x31;
+
+	 node[label = "Y: 0" fillcolor= "azure3" pos= "-1,-0!" shape = box]y0;
+principal -> y0;
+
+	 node[label = " 31, 0
+ Cola tam: 3 " fillcolor= "azure2" pos = " 0, -0! " shape = box]"i31-0";
+ x31 -> "i31-0";
+
+ "i31-0" -> x31; 
+
+ y0 -> "i31-0"
+
+ "i31-0" -> y0 
+}

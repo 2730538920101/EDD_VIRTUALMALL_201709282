@@ -1,4 +1,4 @@
-package Estructura
+package Arboles
 
 import (
 	"fmt"
@@ -72,6 +72,31 @@ func insertarAVL(ar *Arbol, raiz *NodoAVL, nuevo *NodoAVL) {
 	}
 	Equilibrar(ar, raiz)
 }
+// Metodo para obtener un producto de manera recursiva
+func ObtenerNodoProd(raiz *NodoAVL, valor int) *Tiendas.Producto {
+	if raiz == nil {
+		return nil
+	} else if raiz.valor.Codigo == valor{
+		fmt.Println("se encontro el nodo")
+		return raiz.valor
+	} else {
+		var valor1 *Tiendas.Producto
+		if valor > raiz.valor.Codigo {
+			valor1 = ObtenerNodoProd(raiz.der, valor)
+		} else if valor < raiz.valor.Codigo {
+			valor1 = ObtenerNodoProd(raiz.izq, valor)
+		}
+		return valor1
+	}
+}
+
+// Metodo que obtiene el nodo como tal
+func (ar *Arbol) ObtenerPro(valor int) *Tiendas.Producto{
+	var retornado = ObtenerNodoProd(ar.raiz, valor)
+	fmt.Println(retornado)
+	return retornado
+}
+
 
 // Metodo para obtener un arbol de manera recursiva
 func ObtenerNodo(raiz *NodoAVL, valor *Tiendas.Producto) *NodoAVL {

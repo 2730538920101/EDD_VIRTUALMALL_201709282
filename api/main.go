@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
-	"./Tiendas"
-	"./Estructura"
+	
+	"./Estructura/Arboles"
+	"./Estructura/Listas"
+	"./Estructura/Tiendas"
+	"./Estructura/Matriz"
 	"github.com/gorilla/mux"
 	"net/http"
 	"log"
@@ -11,6 +14,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+
 	
 )
 
@@ -22,7 +26,7 @@ var tamdep int
 var tamind int
 
 var data Tiendas.Inicio
-var vector []*Estructura.Lista
+var vector []*Listas.Lista
 //Declarar la variables de tipo ListaDoble
 var Tienda_Esp *Tiendas.Busc_Esp
 var Tienda_Elim *Tiendas.Eliminar_Esp
@@ -36,19 +40,21 @@ var Pedidos *Tiendas.PedInit
 var producto1 *Tiendas.Producto
 var producto2 *Tiendas.Producto
 var producto3 *Tiendas.Producto
-var ListaS *Estructura.ListaSimple
+var ListaS *Listas.ListaSimple
 var tienda *Tiendas.Tienda 
-
+var AvlPedidos *Arboles.Arbol2
 var Prod *Tiendas.Carrito
-var ProdAvl []*Estructura.Arbol
+
+var ProdAvl []*Arboles.Arbol
 var tind map[string]interface{}
+
 
 func main(){
 	fmt.Println("Proyecto de Estructura de Datos, Fase 1")
 	//Crear el enrutador
 	
-	ListaS = Estructura.Nueva_ListaS()
-	
+	ListaS = Listas.Nueva_ListaS()
+	AvlPedidos = Arboles.NewArbol2()
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", indexRoute)
 	router.HandleFunc("/api/cargartienda", CargarTiendas).Methods("POST")
@@ -58,17 +64,85 @@ func main(){
 	router.HandleFunc("/id/{Id}/", Buscar_Posicion).Methods("GET")
 	router.HandleFunc("/Guardar", Guardar).Methods("GET")
 	router.HandleFunc("/Eliminar", Elim_Tienda).Methods("DELETE")
-	router.HandleFunc("/CargarInventario",CargarInventario).Methods("POST")
+	router.HandleFunc("/api/CargarInventario",CargarInventario).Methods("POST")
 	router.HandleFunc("/api/verInventario/{id}", verInventario).Methods("GET")
 	router.HandleFunc("/api/verArbol",verArbol).Methods("GET")
-	router.HandleFunc("/CargarPedido",CargarPedido).Methods("POST")
+	router.HandleFunc("/api/CargarPedido",CargarPedido).Methods("POST")
 	router.HandleFunc("/cargar", Prueba).Methods("POST")
 	router.HandleFunc("/api/ver",verCargar).Methods("GET")
-	router.HandleFunc("/InsertarCarrito",InsertarCarrito).Methods("PUT")
+	router.HandleFunc("/api/InsertarCarrito",InsertarCarrito).Methods("PUT")
+	router.HandleFunc("/api/EliminarCarrito",EliminarCarrito).Methods("DELETE")
+	router.HandleFunc("/api/verCarrito",verCarrito).Methods("GET")
 	
 	log.Fatal(http.ListenAndServe(":3000", router))
 	
 }
+var str [] string = nil
+var resp string = ""
+//Definir una funcion para ver elementos en el carrito
+func verCarrito(w http.ResponseWriter, r *http.Request){
+	var prodcar map[string]interface{}
+	
+	respuesta := "{\n\"Productos\":["
+	str = ListaS.DecodificarLs()
+	resp =strings.Join(str,",")+"]\n"
+	respuesta = respuesta + resp + "}"
+	
+	sal := []byte(respuesta)
+	err2 := json.Unmarshal(sal, &prodcar)
+	if err2 != nil {
+		log.Print(err2)
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&prodcar)
+}
+
+//Definir un metodo para eliminar productos del carrito
+func EliminarCarrito(w http.ResponseWriter, r *http.Request){
+	reqBody,err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
+	}
+	json.Unmarshal(reqBody, &Prod)
+	var ind int = 0
+	tiendanom := Prod.Tienda
+	for a, indice := range index{
+		b := []byte(tiendanom)
+		indi := string(b[0])
+		if indice == indi{
+			ind = a
+			
+		}
+	}
+	dep := Prod.Dep
+	cal := Prod.Calificacion-1
+	pos := ((dep*(tamind)+ind)*(5))+cal
+	cod := Prod.Codigo
+	nom := Prod.Nombre
+	cant := Prod.Cantidad
+	productoFinal :=vector[pos].BuscarProd2(tiendanom, cod, nom, cant)
+	fmt.Println(productoFinal)
+	if productoFinal !=nil{
+		
+		ListaS.Eliminar_Simple(productoFinal)
+		ListaS.Imprimir()
+			
+	}else{
+		fmt.Println("NO HAY PRODUCTO DISPONIBLE EN EL CARRITO")
+	}
+	
+
+	_= json.NewDecoder(r.Body).Decode(&Prod)	
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&Prod)
+}
+
+
+
+
 //Definir un metodo para insertar en el carrito
 func InsertarCarrito(w http.ResponseWriter, r *http.Request){
 	reqBody,err := ioutil.ReadAll(r.Body)
@@ -92,10 +166,15 @@ func InsertarCarrito(w http.ResponseWriter, r *http.Request){
 	cod := Prod.Codigo
 	nom := Prod.Nombre
 	cant := Prod.Cantidad
+	
 	productoFinal :=vector[pos].BuscarProd(tiendanom, cod, nom, cant)
 	if productoFinal !=nil{
-		ListaS.Insertar(productoFinal)
-		ListaS.Imprimir()
+		if ListaS.Buscar_Simple(cod)==nil{
+			ListaS.Insertar(productoFinal)
+			ListaS.Imprimir()
+		}else{
+			fmt.Println("EL PRODUCTO YA SE ENCUENTRA EN EL CARRITO")
+		}
 	}else{
 		fmt.Println("NO HAY PRODUCTO DISPONIBLE")
 	}
@@ -118,7 +197,71 @@ func CargarPedido(w http.ResponseWriter, r *http.Request){
 		fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
 	}
 	json.Unmarshal(reqBody, &Pedidos)
-	fmt.Println(&Pedidos)
+	
+	for i:=0; i<len(Pedidos.Pedidos);i++{
+		fecha := strings.Split(Pedidos.Pedidos[i].Fecha,"-")
+		nomT := Pedidos.Pedidos[i].Tienda
+		depar := Pedidos.Pedidos[i].Departamento
+		cali := Pedidos.Pedidos[i].Calificacion
+		dia, err := strconv.Atoi(fecha[0])
+		var ind int = 0
+		var dep int = 0
+		var cal int = 0
+		for a, indice := range index{
+			b := []byte(nomT)
+			indi := string(b[0])
+			if indice == indi{
+				ind = a
+				
+			}
+		}
+		for p, depa := range departamentos{
+			if depa == depar{
+				dep = p
+				
+			}
+		}
+		cal = cali -1
+		products := Pedidos.Pedidos[i].Productos
+		cola := Matriz.NewCola()
+		pos := ((dep*(tamind)+ind)*(5))+cal
+		for j:=0; j<len(products);j++{
+			p := vector[pos].BuscarProd3(products[j].Codigo)
+			cola.Encolar(p)			
+		}
+		
+		//cola.Mostrar()
+		ano, err := strconv.Atoi(fecha[2])
+		
+		AvlPedidos.InsertarNodoAVL2(ano)
+		nod := AvlPedidos.Obtener2(ano)
+		mesescod, err := strconv.Atoi(fecha[1])
+		nod.Meses.InsertarD(mesescod, i)
+		fmt.Println("MESES")
+		nod.Meses.ImprimirD()
+			
+		
+		if cola.ColaVacia(){
+			fmt.Println("La cola esta vacia")
+		}else{
+			
+			nodof := nod.Meses.BuscarD(mesescod)
+			nodof.Mat.Insertar(dia, dep, cola)
+			nodof.Mat.Comprobar()
+			nodof.Mat.MostarCabecerasX()
+			nodof.Mat.MostarCabecerasY()
+			nodof.Mat.GraphM() 
+		}
+		
+		
+		if err != nil {
+			fmt.Fprintf(w, "No ha ingresado la informacion correctamente")
+		}
+		
+	}
+
+	AvlPedidos.RecorridoInorden2()
+
 	_= json.NewDecoder(r.Body).Decode(&Pedidos)	
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -126,7 +269,7 @@ func CargarPedido(w http.ResponseWriter, r *http.Request){
 }
 //Definir una funcion para graficar los arboles
 func verArbol(w http.ResponseWriter, r *http.Request){
-	Estructura.GraficarAvl(ProdAvl)
+	Arboles.GraficarAvl(ProdAvl)
 	fmt.Fprintf(w,"SE HA CREADO EL GRAFICO DE LOS ARBOLES AVL")
 }
 
@@ -195,7 +338,7 @@ func CargarInventario(w http.ResponseWriter, r *http.Request){
 		fmt.Println("TAMIND: ", tamind)
 		pos := ((dep*(tamind)+ind)*(5))+cal
 		fmt.Println("POS: ", pos)
-		arbol := Estructura.NewArbol()
+		arbol := Arboles.NewArbol()
 		for j:=0; j<len(Tiendaprod);j++{
 			arbol.InsertarNodoAVL(&Tiendaprod[j])
 			
@@ -229,7 +372,7 @@ func indexRoute(w http.ResponseWriter, r *http.Request){
 
 //Definir una funcion para cargar la imagen del vector
 func getArreglo(w http.ResponseWriter, r *http.Request){
-	Estructura.Graph(vector)
+	Listas.Graph(vector)
 	fmt.Fprintf(w, "Se ha generado exitosamente el grafico")
 }
 //Definir una funcion para decodificar el vector en formato json
@@ -251,9 +394,6 @@ func Guardar(w http.ResponseWriter, r *http.Request){
 	if err2 != nil {
 		log.Print(err2)
 	}
-	fmt.Println("BANDERA")
-	fmt.Println()
-	fmt.Printf("%-v\n", tind)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&tind)
@@ -409,17 +549,17 @@ func CargarTiendas(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &data)
 	cantindex := len(data.Data)
 	cantdep := len(data.Data[0].Departamentos)
-	matrix := make([][]*Estructura.NodoM, cantindex)
-	vector = make([]*Estructura.Lista, cantindex*cantdep*5)
+	matrix := make([][]*Listas.NodoM, cantindex)
+	vector = make([]*Listas.Lista, cantindex*cantdep*5)
 	for i:= 0; i < cantindex; i++{
-		matrix[i] = make([]*Estructura.NodoM, cantdep)
+		matrix[i] = make([]*Listas.NodoM, cantdep)
 		letra := string((data.Data[i].Indice)[0])
 		index = append(index, letra)
 		
 		for j := 0; j < cantdep; j++ {
 			departamento := data.Data[i].Departamentos[j].Nombre
 			departamentos = append(departamentos, departamento)
-			espacio := *Estructura.NuevoNM(letra, departamento)
+			espacio := *Listas.NuevoNM(letra, departamento)
 			cant_t := len(data.Data[i].Departamentos[j].Tiendas)
 			
 			for z := 0; z < cant_t; z++{

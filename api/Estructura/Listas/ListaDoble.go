@@ -1,5 +1,5 @@
 //En este paquete definir una Lista Doblemente enlazada para su implementacion
-package Estructura
+package Listas
 //Importar los paquetes necesarios
 import (
 	"fmt"
@@ -126,8 +126,24 @@ func (l *Lista)Imprimir(){
 	fmt.Println()
 	fmt.Println("EL TAMAÑO DE LA LISTA ES: ", l.tam)
 }
+func (l * Lista)BuscarProd3(Cod int)*Tiendas.Producto{
+	aux := l.inicio
+	for aux != nil{
+		for j := 0; j<len(aux.NodoTienda.Productos);j++{
+			if aux.NodoTienda.Productos[j].Codigo == Cod{
+				p := aux.NodoTienda.Productos[j]
+				return &p
+			}
+		}
+		
+		aux = aux.siguiente
+		
+		
+	}
+	return nil
+}
 
-//funcion para buscar productos que devuelve la posicion del producto en su arreglo
+//funcion para buscar productos que devuelve el producto para insertar en el carrito
 func (l * Lista)BuscarProd(Nombre string, Cod int, Nom string, Cant int)*Tiendas.Producto{
 	aux := l.inicio
 	for aux != nil{
@@ -136,6 +152,7 @@ func (l * Lista)BuscarProd(Nombre string, Cod int, Nom string, Cant int)*Tiendas
 			for j:=0; j<len(p);j++{
 				if ((p[j].Codigo == Cod)&&(p[j].Nombre == Nom)){
 					if ((Cant <= p[j].Cantidad)&&(p[j].Cantidad>0)){
+						p[j].Ventas = p[j].Ventas + Cant
 						p[j].Cantidad = p[j].Cantidad - Cant
 						return &p[j]
 					}
@@ -149,7 +166,29 @@ func (l * Lista)BuscarProd(Nombre string, Cod int, Nom string, Cant int)*Tiendas
 	}
 	return nil
 }
-
+//funcion para buscar productos que devuelve el producto seleccionado para eliminar del carrito
+func (l * Lista)BuscarProd2(Nombre string, Cod int, Nom string, Cant int)*Tiendas.Producto{
+	aux := l.inicio
+	for aux != nil{
+		if aux.NodoTienda.Nombre == Nombre{
+			p := aux.NodoTienda.Productos
+			for j:=0; j<len(p);j++{
+				if ((p[j].Codigo == Cod)&&(p[j].Nombre == Nom)){
+					if ((Cant <= p[j].Cantidad)&&(p[j].Cantidad>0)){
+						p[j].Ventas = p[j].Ventas - p[j].Ventas
+						p[j].Cantidad = p[j].Cantidad + Cant
+						return &p[j]
+					}
+				}
+				
+			}
+		}
+		aux = aux.siguiente
+		
+		
+	}
+	return nil
+}
 
 //Definir una funcion para buscar un nodo dentro de la lista
 func (l *Lista)Buscar(Nombre string) *Nodo{

@@ -1,11 +1,16 @@
-package Estructura
+package Matriz
 
 import (
 	"fmt"
+	"../Tiendas"
+	"os"
+	"log"
+	"strconv"
+	"os/exec"
 )
 
 type nodoInterno struct{ //nodo para guardar la informacion
-	Valor int
+	Valor *colaP
 	X int
 	Y int
 	SiguienteX *nodoInterno
@@ -74,9 +79,9 @@ func (m *listaCabecera) buscar(pos int) *nodoCabecera {
 }
 
 //Insertar en matriz
-func (m *Matriz) Insertar(posx int, posy int, id int) {
+func (m *Matriz) Insertar(posx int, posy int, valor *colaP){
 	//crear nuevo nodo
-	nuevo := &nodoInterno{id,posx,posy,nil,nil,nil,nil} //los 4 apuntadores se inician como nulos
+	nuevo := &nodoInterno{valor,posx,posy,nil,nil,nil,nil} //los 4 apuntadores se inician como nulos
 
 	//buscar cabeceras de X en la matriz
 	cabecerax := m.CabecerasX.buscar(posx) 
@@ -110,7 +115,7 @@ func (m *Matriz) Insertar(posx int, posy int, id int) {
 			nuevo.SiguienteX = listaX.Primero
 			listaX.Primero.AnteriorX = nuevo
 			listaX.Primero = nuevo
-			return
+			//return
 		}else { //se recorre la lista para insertar ordenado
 			pivote := listaX.Primero
 
@@ -121,12 +126,12 @@ func (m *Matriz) Insertar(posx int, posy int, id int) {
 					pivote.AnteriorX.SiguienteX = nuevo
 				}else if (nuevo.Y == pivote.Y && nuevo.X == pivote.X ){//comparacion para saber si no se ha insertado una mis posicion
 					fmt.Println("Ya existe un nodo es estas coordenadas")
-					return
+					break
 				} else{ //else el y del nuevo es mayor al del pivote 
 					if (pivote.SiguienteX == nil){ //se valida si se llego al ultimo 
 						pivote.SiguienteX = nuevo //si el siginete es nil 
 						nuevo.AnteriorX = pivote
-						return
+						break
 					}else{
 						pivote = pivote.SiguienteX //si no es el ultimo nos pasamos al siguiente y vuelve a iterar el ciclo
 					}
@@ -149,7 +154,7 @@ func (m *Matriz) Insertar(posx int, posy int, id int) {
 			nuevo.SiguienteY = listaY.Primero
 			listaY.Primero.AnteriorY = nuevo
 			listaY.Primero = nuevo
-			return
+			//return
 		}else { //se recorre la lista para insertar ordenado
 			pivote := listaY.Primero
 
@@ -161,12 +166,12 @@ func (m *Matriz) Insertar(posx int, posy int, id int) {
 					pivote.AnteriorY.SiguienteY = nuevo
 				}else if (nuevo.Y == pivote.Y && nuevo.X == pivote.X ){//comparacion para saber si no se ha insertado una mis posicion
 					fmt.Println("Ya existe un nodo es estas coordenadas")
-					return
+					break
 				} else{ //else el y del nuevo es mayor al del pivote 
 					if (pivote.SiguienteY == nil){ //se valida si se llego al ultimo 
 						pivote.SiguienteY = nuevo //si el siginete es nil 
 						nuevo.AnteriorY = pivote
-						return
+						break
 					}else{
 						pivote = pivote.SiguienteY //si no es el ultimo nos pasamos al siguiente y vuelve a iterar el ciclo
 					}
@@ -213,7 +218,7 @@ func (m * listaCabecera) Insertarcabecera(nuevo * nodoCabecera) {
 						nuevo.Anterior = aux.Anterior
 						aux.Anterior.Siguiente = nuevo
 						aux.Anterior = nuevo
-						return
+						break
 					}
 				}
 			}
@@ -269,4 +274,212 @@ func (m *Matriz) MostarCabecerasY(){
 		fmt.Println(auxy.Valor)
 		auxy = auxy.Siguiente
 	}
+}
+
+//Definir un metodo para graficar la matriz
+func (m *Matriz)GraphM(){
+	os.Create("Estructura/GraficaMatriz"+ strconv.Itoa(m.Capa)+".dot")
+	graphdot := getFileM("Estructura/GraficaMatriz"+strconv.Itoa(m.Capa)+".dot")
+	fmt.Fprintf(graphdot,"digraph G {\n")
+	fmt.Fprintf(graphdot,"rankdir = TB; \n")
+	fmt.Fprintf(graphdot, "node[shape = box, width=0.7, height=0.7, fillcolor=\"azure2\" color=\"white\" style= \"filled\"];\n")
+	fmt.Fprintf(graphdot,"edge[style = \"bold\"];\n")
+	fmt.Fprintf(graphdot, "\n\t node[label = \"Capa: %d\" fillcolor = \"darkolivegreen1\" pos= \"-1,1!\"]principal;\n", m.Capa)
+	//graficar los nodos cabecera
+
+	//Nodos Cabecera X:
+
+	listaAux := m.CabecerasX
+	aux := listaAux.Primero
+	posx := 0
+	for aux != nil{
+		fmt.Fprintf(graphdot, "\n\t node[label = \"X: %d\" fillcolor= \"azure3\" pos= \"%d,1!\" shape = box]x%d;\n", aux.Valor, posx, aux.Valor)
+		aux = aux.Siguiente
+		posx++
+	}
+	aux = listaAux.Primero
+	for aux.Siguiente != nil{
+		fmt.Fprintf(graphdot, "x%d -> x%d; \n", aux.Valor, aux.Siguiente.Valor)
+		fmt.Fprintf(graphdot, "x%d -> x%d; \n", aux.Siguiente.Valor, aux.Valor)
+		aux = aux.Siguiente
+	}
+	fmt.Fprintf(graphdot, "principal -> x%d;\n", listaAux.Primero.Valor)
+
+	//Nodos Cabecera Y:
+
+	listaAuxY := m.CabecerasY
+	auxy := listaAuxY.Primero
+	posy := 0
+	for auxy != nil{
+		fmt.Fprintf(graphdot, "\n\t node[label = \"Y: %d\" fillcolor= \"azure3\" pos= \"-1,-%d!\" shape = box]y%d;\n", auxy.Valor, posy, auxy.Valor)
+		auxy = auxy.Siguiente
+		posy++
+	}
+	auxy = listaAuxY.Primero
+	for auxy.Siguiente != nil{
+		fmt.Fprintf(graphdot, "y%d -> y%d; \n", auxy.Valor, auxy.Siguiente.Valor)
+		fmt.Fprintf(graphdot, "y%d -> y%d; \n", auxy.Siguiente.Valor, auxy.Valor)
+		auxy = auxy.Siguiente
+	}
+	fmt.Fprintf(graphdot, "principal -> y%d;\n", listaAuxY.Primero.Valor)
+
+	//Nodos Internos:
+	
+	pivoteX := listaAux.Primero
+	posx = 0
+	for pivoteX != nil{
+		pivoteInterno := pivoteX.Lista.Primero
+		for pivoteInterno != nil{
+			pivoteY := listaAuxY.Primero
+			posyI := 0
+			for pivoteY != nil{
+				if pivoteY.Valor == pivoteInterno.Y{
+					break
+				}
+				posyI++
+				pivoteY = pivoteY.Siguiente
+			}
+			fmt.Fprintf(graphdot, "\n\t node[label = \" %d, %d\n Cola tam: %d \" fillcolor= \"azure2\" pos = \" %d, -%d! \" shape = box]\"i%d-%d\";", pivoteInterno.X, pivoteInterno.Y, pivoteInterno.Valor.Size(), posx, posyI,pivoteInterno.X, pivoteInterno.Y )
+			pivoteInterno = pivoteInterno.SiguienteX
+		}
+		pivoteInterno = pivoteX.Lista.Primero
+		for pivoteInterno != nil{
+			if pivoteInterno.SiguienteX != nil{
+				fmt.Fprintf(graphdot, "\n \"i%d-%d\" -> \"i%d-%d\";\n", pivoteInterno.X, pivoteInterno.Y, pivoteInterno.SiguienteX.X, pivoteInterno.SiguienteY.Y)
+				fmt.Fprintf(graphdot, "\n \"i%d-%d\" -> \"i%d-%d\";\n", pivoteInterno.SiguienteX.X, pivoteInterno.SiguienteY.Y, pivoteInterno.X, pivoteInterno.Y)
+			}
+			pivoteInterno = pivoteInterno.SiguienteX
+		}
+		fmt.Fprintf(graphdot, "\n x%d -> \"i%d-%d\";\n", pivoteX.Valor, pivoteX.Lista.Primero.X, pivoteX.Lista.Primero.Y)
+		fmt.Fprintf(graphdot, "\n \"i%d-%d\" -> x%d; \n", pivoteX.Lista.Primero.X, pivoteX.Lista.Primero.Y, pivoteX.Valor)
+		pivoteX = pivoteX.Siguiente
+		posx++
+	}
+	pivoteY := listaAuxY.Primero
+	for pivoteY != nil{
+		pivoteInterno := pivoteY.Lista.Primero
+		for pivoteInterno != nil{
+			if pivoteInterno.SiguienteY != nil{
+				fmt.Fprintf(graphdot, "\n \"i%d-%d\" -> \"i%d-%d\";\n", pivoteInterno.X, pivoteInterno.Y, pivoteInterno.SiguienteY.X, pivoteInterno.SiguienteY.Y)
+				fmt.Fprintf(graphdot, "\n \"i%d-%d\" -> \"i%d-%d\";\n", pivoteInterno.SiguienteY.X, pivoteInterno.SiguienteY.Y, pivoteInterno.X, pivoteInterno.Y)
+			}
+			pivoteInterno = pivoteInterno.SiguienteY
+		}
+		fmt.Fprintf(graphdot, "\n y%d -> \"i%d-%d\"\n", pivoteY.Valor, pivoteY.Lista.Primero.X, pivoteY.Lista.Primero.Y)
+		fmt.Fprintf(graphdot, "\n \"i%d-%d\" -> y%d \n", pivoteY.Lista.Primero.X, pivoteY.Lista.Primero.Y, pivoteY.Valor)
+		pivoteY = pivoteY.Siguiente
+	}
+	fmt.Fprintf(graphdot, "}\n")
+	exec.Command("neato", "-Tpng", "Estructura/GraficaMatriz"+ strconv.Itoa(m.Capa)+".dot", "-o", "Estructura/GraficaMatriz"+ strconv.Itoa(m.Capa)+".png").Output()
+	graphdot.Close()
+
+
+
+}
+
+
+//Definir una funcion para crear un archivo
+func getFileM(path string) *os.File{
+	file, err := os.OpenFile(path, os.O_RDWR,0775)
+	if err != nil{
+		log.Fatal(err)
+	}
+	return file
+}
+
+
+
+
+
+
+//-----------------------------------------------------------------COLA----------------------------------//
+
+type nodocolaP struct {
+	siguiente *nodocolaP
+	pedido     *Tiendas.Producto
+}
+
+type colaP struct {
+	frente *nodocolaP
+	fondo  *nodocolaP
+	tam    int
+}
+
+// crear cola
+func NewCola() *colaP {
+	return &colaP{nil, nil, 0}
+}
+
+//Metodo para verificar si la cola esta vacía
+func (m *colaP) ColaVacia() bool {
+	return m.frente == nil
+}
+
+//Metodo para agregar datos a la cola
+func (m *colaP) Encolar(pedido *Tiendas.Producto) {
+	aux := &nodocolaP{nil, pedido}
+	if m.ColaVacia() {
+		m.frente = aux
+		m.fondo = aux
+	} else {
+		m.fondo.siguiente = aux
+		m.fondo = aux
+	}
+	m.tam++
+}
+
+//funcion para eliminar un dato de la cola
+func (m *colaP) Desencolar() {
+	if !m.ColaVacia() {
+		aux := m.frente
+		m.frente = aux.siguiente
+		aux = nil
+		m.tam--
+	} else {
+		fmt.Println("la cola esta vacia")
+	}
+}
+
+//mostrar cola de datos
+func (m *colaP) Mostrar() {
+	if !m.ColaVacia() {
+		aux := m.frente
+		for aux != nil {
+			fmt.Print("[", aux.pedido, "]->")
+			aux = aux.siguiente
+		}
+		fmt.Println()
+	} else {
+		fmt.Println("la cola esta vacia")
+	}
+}
+
+//Metodo para ver el frente de la cola
+func (m *colaP) Front() *nodocolaP{
+	fmt.Println("el frente es: ", m.frente)
+	return m.frente
+}
+
+//Metodo para mostrar el fondo
+func (m *colaP) Rear() *nodocolaP{
+	fmt.Println("el ultimo nodo es: ", m.fondo.pedido)
+	return m.fondo
+}
+
+//Metodo para vaciar la cola
+func (m *colaP) Vaciar() {
+	if !m.ColaVacia() {
+		for !m.ColaVacia() {
+			m.Desencolar()
+		}
+	} else {
+		fmt.Println("la cola esta vacia")
+	}
+
+}
+
+//Metodo para retornar el tamaño de la cola
+func (m *colaP) Size() int {
+	fmt.Println("el tamaño de la cola es: ", m.tam)
+	return m.tam
 }
